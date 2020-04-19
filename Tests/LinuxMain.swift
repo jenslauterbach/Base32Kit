@@ -3,5 +3,5 @@ import XCTest
 import Base32KitTests
 
 var tests = [XCTestCaseEntry]()
-tests += Encoding.allTests()
+tests += Base32KitTests.allTests()
 XCTMain(tests)
