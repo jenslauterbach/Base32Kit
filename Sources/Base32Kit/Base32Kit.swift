@@ -1,12 +1,47 @@
 // MARK: Public API
-struct Base32 {
+public struct Base32 {
     
-    static func encode(string s: String) -> String {
-        return encode(bytes: Array(s.utf8))
+    /// Encodes the given `string` with the standard Base 32 alphabet.
+    ///
+    /// If the given `string` is empty, the encoded `String` will also be empty. The  result can contain padding (`=`), if the given `string` does not
+    /// contain a multiple of 5 input characters.
+    ///
+    /// Examples:
+    ///
+    ///     Base32.encode("")       // Result: ""
+    ///     Base32.encode("f")      // Result: "MY======"
+    ///     Base32.encode("fo")     // Result: "MZXQ===="
+    ///     Base32.encode("foo")    // Result: "MZXW6==="
+    ///     Base32.encode("foob")   // Result: "MZXW6YQ="
+    ///     Base32.encode("fooba")  // Result: "MZXW6YTB"
+    ///     Base32.encode("foobar") // Result: "MZXW6YTBOI======"
+    ///
+    /// - Parameter string: The UTF8 string to encode.
+    ///
+    /// - Returns: Base 32 encoded `String` or empty `String` if the given `string` is empty.
+    public static func encode(string: String) -> String {
+        return encode(bytes: Array(string.utf8))
     }
     
-    static func decode(string s: String) -> String {
-        return decode(bytes: Array(s.utf8))
+    /// Decodes the given `string` with the standard Base 32 alphabet.
+    ///
+    /// If the given `string` is empty, the decoded `String` will also be empty.
+    ///
+    /// Examples:
+    ///
+    ///     Base32.decode("")                   // Result: ""
+    ///     Base32.decode("MY======")           // Result: "f"
+    ///     Base32.decode("MZXQ====")           // Result: "fo"
+    ///     Base32.decode("MZXW6===")           // Result: "foo"
+    ///     Base32.decode("MZXW6YQ=")           // Result: "foob"
+    ///     Base32.decode("MZXW6YTB")           // Result: "fooba"
+    ///     Base32.decode("MZXW6YTBOI======")   // Result: "foobar"
+    ///
+    /// - Parameter string: The UTF8 string to decode.
+    ///
+    /// - Returns: Decoded UTF8 string or empty `String` if the given `string` is empty.
+    public static func decode(string: String) -> String {
+        return decode(bytes: Array(string.utf8))
     }
 
 }
