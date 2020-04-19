@@ -3,6 +3,11 @@ import XCTest
 
 final class EncodingTests: XCTestCase {
     
+    public static var allTests = [
+        ("testRFC4648TestVectors", testRFC4648TestVectors),
+        ("testCapacityFormula", testCapacityFormula)
+    ]
+    
     func testRFC4648TestVectors() {
         let testData: [String: String] = [
             "": "",
@@ -40,9 +45,4 @@ final class EncodingTests: XCTestCase {
             XCTAssertEqual(result, expectedCapacity)
         }
     }
-
-    static var allTests = [
-        ("testRFC4648TestVectors", testRFC4648TestVectors),
-        ("testCapacityFormula", testCapacityFormula)
-    ]
 }
