@@ -1,7 +1,7 @@
 import XCTest
 @testable import Base32Kit
 
-final class Base32KitTests: XCTestCase {
+final class EncodingTests: XCTestCase {
     
     func testRFC4648TestVectors() {
         let testData: [String: String] = [
@@ -19,8 +19,30 @@ final class Base32KitTests: XCTestCase {
             XCTAssertEqual(encoded, expected, "Input '\(input)' could not be encoded correctly. Expected: \(expected), Actual: \(encoded).")
         }
     }
+    
+    func testCapacityFormula() {
+        let testData: [Int: Int] = [
+            1: 8,
+            2: 8,
+            3: 8,
+            4: 8,
+            5: 8,
+            6: 16,
+            10: 16,
+            11: 24,
+            20: 32,
+            21: 40,
+            100: 160
+        ]
+        
+        for (count, expectedCapacity) in testData {
+            let result = ((count + 4) / 5) * 8
+            XCTAssertEqual(result, expectedCapacity)
+        }
+    }
 
     static var allTests = [
-        ("testExample", testRFC4648TestVectors),
+        ("testRFC4648TestVectors", testRFC4648TestVectors),
+        ("testCapacityFormula", testCapacityFormula)
     ]
 }
