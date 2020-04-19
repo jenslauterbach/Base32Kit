@@ -1,16 +1,25 @@
-name: Swift
+name: Build and Test
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
-  build:
-
+  macOS:
     runs-on: macos-latest
-
+    strategy:
+      matrix:
+        xcode: [
+          11.4,
+          11.3.1,
+          11.2.1,
+          11.1,
+          11.0
+        ]
+    env:
+      # Checkout installed software to find out which XCode versions are supported:
+      # https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#xcode
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
     steps:
     - uses: actions/checkout@v2
     - name: Build
