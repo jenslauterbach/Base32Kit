@@ -1,16 +1,47 @@
-name: Swift
+name: Build and Test
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
-  build:
-
+  macOS:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        xcode: [
+          Xcode_11.4,
+          Xcode_11.3.1,
+          Xcode_11.2.1,
+          Xcode_11.1,
+          Xcode_11
+        ]
+    env:
+      # Checkout installed software to find out which XCode versions are supported:
+      # https://github.com/actions/virtual-environments/blob/master/images/macos/macos-10.15-Readme.md#xcode
+      DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: swift build -v
+    - name: Run tests
+      run: swift test -v
 
+  Linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        swift-version: [
+          "5.2",
+          "5.1",
+          "5.0"
+        ]
+        ubuntu-version: [
+          bionic, # 18.04.x
+          xenial  # 16.04.x
+        ]
+    container:
+      image: swift:${{ matrix.swift-version }}-${{ matrix.ubuntu-version }}
     steps:
     - uses: actions/checkout@v2
     - name: Build
