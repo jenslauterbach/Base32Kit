@@ -1,12 +1,47 @@
 // MARK: Public API
-struct Base32 {
+public struct Base32 {
     
-    static func encode(string s: String) -> String {
-        return encode(bytes: Array(s.utf8))
+    /// Encodes the given `string` with the standard Base 32 alphabet.
+    ///
+    /// If the given `string` is empty, the encoded `String` will also be empty. The  result can contain padding (`=`), if the given `string` does not
+    /// contain a multiple of 5 input characters.
+    ///
+    /// Examples:
+    ///
+    ///     Base32.encode("")       // Result: ""
+    ///     Base32.encode("f")      // Result: "MY======"
+    ///     Base32.encode("fo")     // Result: "MZXQ===="
+    ///     Base32.encode("foo")    // Result: "MZXW6==="
+    ///     Base32.encode("foob")   // Result: "MZXW6YQ="
+    ///     Base32.encode("fooba")  // Result: "MZXW6YTB"
+    ///     Base32.encode("foobar") // Result: "MZXW6YTBOI======"
+    ///
+    /// - Parameter string: The UTF8 string to encode.
+    ///
+    /// - Returns: Base 32 encoded `String` or empty `String` if the given `string` is empty.
+    public static func encode(string: String) -> String {
+        return encode(bytes: Array(string.utf8))
     }
     
-    static func decode(string s: String) -> String {
-        return decode(bytes: Array(s.utf8))
+    /// Decodes the given `string` with the standard Base 32 alphabet.
+    ///
+    /// If the given `string` is empty, the decoded `String` will also be empty.
+    ///
+    /// Examples:
+    ///
+    ///     Base32.decode("")                   // Result: ""
+    ///     Base32.decode("MY======")           // Result: "f"
+    ///     Base32.decode("MZXQ====")           // Result: "fo"
+    ///     Base32.decode("MZXW6===")           // Result: "foo"
+    ///     Base32.decode("MZXW6YQ=")           // Result: "foob"
+    ///     Base32.decode("MZXW6YTB")           // Result: "fooba"
+    ///     Base32.decode("MZXW6YTBOI======")   // Result: "foobar"
+    ///
+    /// - Parameter string: The UTF8 string to decode.
+    ///
+    /// - Returns: Decoded UTF8 string or empty `String` if the given `string` is empty.
+    public static func decode(string: String) -> String {
+        return decode(bytes: Array(string.utf8))
     }
 
 }
@@ -211,80 +246,6 @@ extension Base32 {
         }
         
         return String(decoding: output, as: Unicode.UTF8.self)
-    }
-    
-    private static func decode(firstByte: UInt8, secondByte: UInt8?) -> UInt8 {
-        var index = alphabetDecodeTable[Int(firstByte)] << 3
-        
-        if let secondByte = secondByte {
-            index |= alphabetDecodeTable[Int(secondByte)] >> 2
-        }
-        
-        return index
-    }
-    
-    private static func decode(secondByte: UInt8?, thirdByte: UInt8?, fourthByte: UInt8?) -> UInt8? {
-        guard let secondByte = secondByte else {
-            return nil
-        }
-        
-        var index = alphabetDecodeTable[Int(secondByte)] << 6
-        
-        if let thirdByte = thirdByte {
-            index |= alphabetDecodeTable[Int(thirdByte)] << 1
-        }
-        
-        if let fourthByte = fourthByte {
-            index |= alphabetDecodeTable[Int(fourthByte)] >> 4
-        }
-        
-        return index
-    }
-    
-    private static func decode(fourthByte: UInt8?, fifthByte: UInt8?) -> UInt8? {
-        guard let fourthByte = fourthByte else {
-            return nil
-        }
-        
-        var index = alphabetDecodeTable[Int(fourthByte)] << 4
-        
-        if let fifthByte = fifthByte {
-            index |= alphabetDecodeTable[Int(fifthByte)] >> 1
-        }
-        
-        return index
-    }
-    
-    private static func decode(fifthByte: UInt8?, sixthByte: UInt8?, seventhByte: UInt8?) -> UInt8? {
-        guard let fifthByte = fifthByte else {
-            return nil
-        }
-        
-        var index = alphabetDecodeTable[Int(fifthByte)] << 7
-        
-        if let sixthByte = sixthByte {
-            index |= alphabetDecodeTable[Int(sixthByte)] << 2
-        }
-        
-        if let seventhByte = seventhByte {
-            index |= alphabetDecodeTable[Int(seventhByte)] >> 3
-        }
-        
-        return index
-    }
-    
-    private static func decode(seventhByte: UInt8?, eightByte: UInt8?) -> UInt8? {
-        guard let seventhByte = seventhByte else {
-            return nil
-        }
-        
-        var index = alphabetDecodeTable[Int(seventhByte)] << 5
-        
-        if let eigthByte = eightByte {
-            index |= alphabetDecodeTable[Int(eigthByte)]
-        }
-        
-        return index
     }
 }
 
