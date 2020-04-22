@@ -78,18 +78,10 @@ final class DecodingTests: XCTestCase {
         let testData = generateRandomInvalidLengthStrings(count: 100)
         
         for encoded in testData {
-            var thrownError: Error?
-            
-            XCTAssertThrowsError(try Base32.decode(string: encoded), "Should have thrown for '\(encoded)'") {
-                thrownError = $0
-            }
-            
-            XCTAssertTrue(
-                thrownError is DecodingError,
-                "Unexpected error type: \(type(of: thrownError))"
+            assert(
+                try Base32.decode(string: encoded),
+                throws: Base32.DecodingError.invalidLength
             )
-            
-            XCTAssertEqual(thrownError as? DecodingError, .invalidLength)
         }
     }
     
@@ -99,7 +91,7 @@ final class DecodingTests: XCTestCase {
             
             assert(
                 try Base32.decode(string: encoded),
-                throws: DecodingError.invalidCharacter([Character(UnicodeScalar(character))])
+                throws: Base32.DecodingError.invalidCharacter([Character(UnicodeScalar(character))])
             )
         }
     }
@@ -113,7 +105,7 @@ final class DecodingTests: XCTestCase {
             let encoded = emoji + "======="
             assert(
                 try Base32.decode(string: encoded),
-                throws: DecodingError.invalidCharacter([Character(emoji)])
+                throws: Base32.DecodingError.invalidCharacter([Character(emoji)])
             )
         }
     }
@@ -136,7 +128,7 @@ final class DecodingTests: XCTestCase {
         for (encoded, invalidCharacter) in testStrings {
             assert(
                 try Base32.decode(string: encoded),
-                throws: DecodingError.invalidCharacter([Character(invalidCharacter)])
+                throws: Base32.DecodingError.invalidCharacter([Character(invalidCharacter)])
             )
         }
     }
@@ -173,7 +165,7 @@ final class DecodingTests: XCTestCase {
         for encoded in testStrings {
             assert(
                 try Base32.decode(string: encoded),
-                throws: DecodingError.invalidPaddingCharacters
+                throws: Base32.DecodingError.invalidPaddingCharacters
             )
         }
     }
