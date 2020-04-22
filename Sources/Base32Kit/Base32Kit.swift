@@ -54,15 +54,15 @@ public struct Base32 {
         // characters, but those eight visible characters are constructed of more than eight separate bytes. If the
         // length of the byte array is checked, it might lead to false positives.
         guard string.count % 8 == 0 else {
-            throw DecodingError.invalidLength
+            throw Base32.DecodingError.invalidLength
         }
         
         if let invalidCharacter = invalidCharacters(in: string) {
-            throw DecodingError.invalidCharacter(invalidCharacter)
+            throw Base32.DecodingError.invalidCharacter(invalidCharacter)
         }
         
         if invalidPadding(in: string) {
-            throw DecodingError.invalidPaddingCharacters
+            throw Base32.DecodingError.invalidPaddingCharacters
         }
         
         return try decode(bytes: Array(string.utf8))
@@ -326,7 +326,7 @@ extension IteratorProtocol where Self.Element == UInt8 {
             return value
         }
         
-        throw DecodingError.invalidCharacter([Character.init(Unicode.Scalar.init(ascii))])
+        throw Base32.DecodingError.invalidCharacter([Character.init(Unicode.Scalar.init(ascii))])
     }
     
     mutating func nextValueOrEmpty() -> UInt8? {
