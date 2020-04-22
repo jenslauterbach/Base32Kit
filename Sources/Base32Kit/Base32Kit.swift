@@ -49,10 +49,6 @@ public struct Base32 {
             return ""
         }
         
-        // The length of the input string has to be checked at this point, based on the given String instead of the
-        // byte array that is handed off to the internal 'decode' method. Unicode strings can contain eight "visible"
-        // characters, but those eight visible characters are constructed of more than eight separate bytes. If the
-        // length of the byte array is checked, it might lead to false positives.
         guard string.count % 8 == 0 else {
             throw Base32.DecodingError.invalidLength
         }
@@ -69,23 +65,14 @@ public struct Base32 {
     }
     
     private static func invalidPadding(in string: String) -> Bool {
-        // TODO: Refactor this very naive implementation to find "misplaced" padding characters in the given String.
-        
         // The String is never allowed to start with a padding character:
         if string.starts(with: "=") {
             return true
         }
         
-        var foundPadding = false
-        
-        for character in string {
-            if foundPadding && (character.isLetter || character.isNumber) {
-                return true
-            }
-            
-            if character == "=" {
-                foundPadding = true
-            }
+        if let index = string.firstIndex(of: "=") {
+            let substring = string[index..<string.endIndex]
+            return !substring.allSatisfy({$0 == "="})
         }
         
         return false
