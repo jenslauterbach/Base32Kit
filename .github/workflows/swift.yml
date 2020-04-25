@@ -53,11 +53,7 @@ jobs:
 
   Codecov:
     runs-on: ubuntu-latest
-    container:
-      image: swift:latest
-      volumes:
-      - ${GITHUB_WORKSPACE}:/src
-      options: --workdir /src
+    container: swift:latest
     steps:
     - name: Checkout
       uses: actions/checkout@v1
