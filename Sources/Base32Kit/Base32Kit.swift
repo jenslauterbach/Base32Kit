@@ -323,7 +323,10 @@ extension Base32 {
 extension IteratorProtocol where Self.Element == UInt8 {
 
     mutating func nextValue() throws -> UInt8 {
-        let ascii = self.next()! // TODO: Refactor to not force-unwrap
+        guard let ascii = self.next() else {
+            throw Base32.DecodingError.missingCharacter
+        }
+        
         let value = Base32.alphabetDecodeTable[Int(ascii)]
         
         if value < 31 {
@@ -334,7 +337,10 @@ extension IteratorProtocol where Self.Element == UInt8 {
     }
     
     mutating func nextValueOrEmpty() -> UInt8? {
-        let ascii = self.next()! // TODO: Refactor to not force-unwrap
+        guard let ascii = self.next() else {
+            return nil
+        }
+        
         if ascii == Base32.encodePaddingCharacter {
             return nil
         }

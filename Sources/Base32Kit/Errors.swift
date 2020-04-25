@@ -26,5 +26,8 @@ extension Base32 {
         
         /// Thrown when the encoded `String` decodes to a result that is illegal.
         case invalidEncodedString
+        
+        /// Thrown when reading the encoded `String` and no character can be found at position one or two even though it should exist.
+        case missingCharacter
     }
 }
