@@ -1,8 +1,14 @@
 name: Build and Test
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**.swift'
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
     paths:
       - '**.swift'
 
@@ -53,18 +59,20 @@ jobs:
 
   Codecov:
     runs-on: ubuntu-latest
+    container: swift:latest
     steps:
     - name: Checkout
       uses: actions/checkout@v1
       with:
         fetch-depth: 1
+    - name: Install curl
+      run: apt-get update && apt-get install -y curl # required by the codecov action.
     - name: Test
       run: swift test --enable-code-coverage --enable-test-discovery
     - name: Convert coverage files
       run: llvm-cov export -format="lcov" .build/debug/Base32KitPackageTests.xctest -instr-profile .build/debug/codecov/default.profdata > info.lcov
     - name: Upload to codecov.io
-      uses: codecov/codecov-action@v1.0.3
+      uses: codecov/codecov-action@v1
       with:
         token: ${{secrets.CODECOV_TOKEN}}
-        flags: base32,unittests
         file: info.lcov
