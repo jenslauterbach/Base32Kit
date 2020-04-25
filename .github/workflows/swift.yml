@@ -50,3 +50,21 @@ jobs:
       run: swift build -v
     - name: Run tests
       run: swift test -v
+
+  Codecov:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Test
+      run: swift test --enable-code-coverage --enable-test-discovery
+    - name: Convert coverage files
+      run: llvm-cov export -format="lcov" .build/debug/Base32KitPackageTests.xctest -instr-profile .build/debug/codecov/default.profdata > info.lcov
+    - name: Upload to codecov.io
+      uses: codecov/codecov-action@v1.0.3
+      with:
+        token: ${{secrets.CODECOV_TOKEN}}
+        flags: base32,unittests
+        file: info.lcov
