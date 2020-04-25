@@ -20,6 +20,10 @@ public struct Base32 {
     ///
     /// - Returns: Base 32 encoded `String` or empty `String` if the given `string` is empty.
     public static func encode(string: String) -> String {
+        guard !string.isEmpty else {
+            return ""
+        }
+        
         return encode(bytes: Array(string.utf8))
     }
     
@@ -78,6 +82,24 @@ public struct Base32 {
         return false
     }
     
+    /// Validates that the given Base 32 encoded string contains only legal characters.
+    ///
+    /// Legal characters are as defined by RFC 4648 are:
+    ///
+    /// ```
+    /// A, B, C, D, E, F, G, H,
+    /// I, J, K, L, M, N, O, P,
+    /// Q, R, S, T, U, V, W, X,
+    /// Y, Z, 2, 3, 4, 5, 6, 7
+    /// ```
+    ///
+    /// Missing from this list is the number zero (`0`), number one (`1`), number eight (`8`) and number nine (`9`). This was done to reduce confusion.
+    /// Numbers like zero can look very much like the character `O` (uppercase).
+    ///
+    /// In addition to those characters the lowercased variant of those characters are allowed as well.
+    ///
+    /// - Parameters:
+    ///    - in: the Base 32 encoded string to check for illegal characters.
     private static func invalidCharacters(in string: String) -> [Character]? {
         var invalidCharacters: [Character] = []
         
@@ -113,16 +135,11 @@ public struct Base32 {
 extension Base32 {
     
     private static func encode<Buffer: Collection>(bytes: Buffer) -> String where Buffer.Element == UInt8 {
-        if bytes.isEmpty {
-            return ""
-        }
+        var encoded = [UInt8]()
+        let capacity = ((bytes.count + 4) / 5) * 8
+        encoded.reserveCapacity(capacity)
         
         var input = bytes.makeIterator()
-        
-        var output = [UInt8]()
-        let capacity = ((bytes.count + 4) / 5) * 8
-        output.reserveCapacity(capacity)
-        
         while let firstByte = input.next() {
             let secondByte = input.next()
             let thirdByte = input.next()
@@ -138,17 +155,17 @@ extension Base32 {
             let seventhChar = Base32.encode(fourthByte: fourthByte, fifthByte: fifthByte)
             let eightChar = Base32.encode(fifthByte: fifthByte)
             
-            output.append(firstChar)
-            output.append(secondChar)
-            output.append(thirdChar)
-            output.append(fourthChar)
-            output.append(fifthChar)
-            output.append(sixthChar)
-            output.append(seventhChar)
-            output.append(eightChar)
+            encoded.append(firstChar)
+            encoded.append(secondChar)
+            encoded.append(thirdChar)
+            encoded.append(fourthChar)
+            encoded.append(fifthChar)
+            encoded.append(sixthChar)
+            encoded.append(seventhChar)
+            encoded.append(eightChar)
         }
         
-        return String(decoding: output, as: Unicode.UTF8.self)
+        return String(decoding: encoded, as: Unicode.UTF8.self)
     }
     
     private static func encode(firstByte: UInt8) -> UInt8 {

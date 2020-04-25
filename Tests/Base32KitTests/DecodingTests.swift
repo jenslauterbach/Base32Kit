@@ -10,7 +10,9 @@ final class DecodingTests: XCTestCase {
         ("testInvalidAsciiCharacters", testInvalidAsciiCharacters),
         ("testEmoji", testEmoji),
         ("testLineBreaks", testLineBreaks),
-        ("testMisplacedPaddingCharacter", testMisplacedPaddingCharacter)
+        ("testMisplacedPaddingCharacter", testMisplacedPaddingCharacter),
+        ("testNulCharacter", testNulCharacter),
+        ("testCaseSensitivity", testCaseSensitivity)
     ]
     
     private let invalidAsciiCharacters: Set<UInt8> = {
@@ -34,7 +36,8 @@ final class DecodingTests: XCTestCase {
         // Remove the padding character ("=") from the list, because it is allowed:
         asciiCharacters.remove(Base32.encodePaddingCharacter)
         
-        // Remove the "NUL" control character. It can not be part of a String and therefore is a "non character".
+        // Remove the "NUL" control character. It can not be part of a String and therefore is a "non character". There
+        // is a separate test to specfically test for the NUL character.
         asciiCharacters.remove(0)
         
         return asciiCharacters
@@ -167,6 +170,50 @@ final class DecodingTests: XCTestCase {
                 try Base32.decode(string: encoded),
                 throws: Base32.DecodingError.invalidPaddingCharacters
             )
+        }
+    }
+    
+    /// Tests if decoding breaks if the string contains a NUL character.
+    ///
+    /// As stated in RFC4648, section 12:
+    ///
+    /// "A decoder should not break on invalid input including, e.g., embedded NUL characters (ASCII 0)."
+    ///
+    /// - SeeAlso: https://tools.ietf.org/html/rfc4648#section-12
+    private func testNulCharacter() {
+        let bytes: [UInt8] = [
+            77, // M
+            90, // Z
+             0, // NUL <-- This should not break the decoder.
+            81, // Q
+            61, // =
+            61, // =
+            61, // =
+            61  // =
+        ]
+        
+        let encoded = String(decoding: bytes, as: Unicode.UTF8.self)
+        
+        assert(
+            try Base32.decode(string: encoded),
+            throws: Base32.DecodingError.invalidCharacter([Character(UnicodeScalar(0))])
+        )
+    }
+    
+    func testCaseSensitivity() throws {
+        let testData: [String: String] = [
+            "": "",
+            "MY======": "f",
+            "MzXq====": "fo",
+            "MZxw6===": "foo",
+            "mZXW6yQ=": "foob",
+            "MZXW6Ytb": "fooba",
+            "mzXw6YTBoI======": "foobar"
+        ]
+        
+        for (input, expected) in testData {
+            let decoded = try Base32.decode(string: input)
+            XCTAssertEqual(decoded, expected, "Input '\(input)' could not be decoded correctly. Expected: \(expected), Actual: \(decoded).")
         }
     }
     

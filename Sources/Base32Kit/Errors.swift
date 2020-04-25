@@ -23,5 +23,8 @@ extension Base32 {
         /// - OK: `"MZXQ===="`
         /// - Not OK: `"M=XQ===="`
         case invalidPaddingCharacters
+        
+        /// Thrown when the encoded `String` decodes to a result that is illegal.
+        case invalidEncodedString
     }
 }
