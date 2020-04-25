@@ -60,7 +60,7 @@ jobs:
       with:
         fetch-depth: 1
     - name: Install curl
-      run: apt-get -q install -y curl # required by the codecov action.
+      run: apt-get update && apt-get install -y curl # required by the codecov action.
     - name: Test
       run: swift test --enable-code-coverage --enable-test-discovery
     - name: Convert coverage files
