@@ -64,7 +64,7 @@ jobs:
     - name: Convert coverage files
       run: llvm-cov export -format="lcov" .build/debug/Base32KitPackageTests.xctest -instr-profile .build/debug/codecov/default.profdata > info.lcov
     - name: Upload to codecov.io
-      uses: codecov/codecov-action@v1.0.3
+      uses: codecov/codecov-action@v1
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         file: info.lcov
