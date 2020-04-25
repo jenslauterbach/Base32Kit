@@ -1,8 +1,14 @@
 name: Build and Test
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**.swift'
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
     paths:
       - '**.swift'
 
