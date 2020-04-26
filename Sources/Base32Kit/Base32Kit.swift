@@ -24,7 +24,15 @@ public struct Base32 {
             return ""
         }
         
-        return encode(bytes: Array(string.utf8))
+        return encode(bytes: Array(string.utf8), alphabet: Alphabet.base32)
+    }
+    
+    public static func encodeHex(string: String) -> String {
+        guard !string.isEmpty else {
+            return ""
+        }
+        
+        return encode(bytes: Array(string.utf8), alphabet: Alphabet.base32hex)
     }
     
     /// Decodes the given `string` with the standard Base 32 alphabet.
@@ -134,7 +142,7 @@ public struct Base32 {
 // MARK: Encoding (Private)
 extension Base32 {
     
-    private static func encode<Buffer: Collection>(bytes: Buffer) -> String where Buffer.Element == UInt8 {
+    private static func encode<Buffer: Collection>(bytes: Buffer, alphabet: [UInt8]) -> String where Buffer.Element == UInt8 {
         var encoded = [UInt8]()
         let capacity = ((bytes.count + 4) / 5) * 8
         encoded.reserveCapacity(capacity)
@@ -146,14 +154,14 @@ extension Base32 {
             let fourthByte = input.next()
             let fifthByte = input.next()
             
-            let firstChar = Base32.encode(firstByte: firstByte)
-            let secondChar = Base32.encode(firstByte: firstByte, secondByte: secondByte)
-            let thirdChar = Base32.encode(secondByte: secondByte)
-            let fourthChar = Base32.encode(secondByte: secondByte, thirdByte: thirdByte)
-            let fifthChar = Base32.encode(thirdByte: thirdByte, fourthByte: fourthByte)
-            let sixthChar = Base32.encode(fourthByte: fourthByte)
-            let seventhChar = Base32.encode(fourthByte: fourthByte, fifthByte: fifthByte)
-            let eightChar = Base32.encode(fifthByte: fifthByte)
+            let firstChar = Base32.encode(alphabet: alphabet, firstByte: firstByte)
+            let secondChar = Base32.encode(alphabet: alphabet, firstByte: firstByte, secondByte: secondByte)
+            let thirdChar = Base32.encode(alphabet: alphabet, secondByte: secondByte)
+            let fourthChar = Base32.encode(alphabet: alphabet, secondByte: secondByte, thirdByte: thirdByte)
+            let fifthChar = Base32.encode(alphabet: alphabet, thirdByte: thirdByte, fourthByte: fourthByte)
+            let sixthChar = Base32.encode(alphabet: alphabet, fourthByte: fourthByte)
+            let seventhChar = Base32.encode(alphabet: alphabet, fourthByte: fourthByte, fifthByte: fifthByte)
+            let eightChar = Base32.encode(alphabet: alphabet, fifthByte: fifthByte)
             
             encoded.append(firstChar)
             encoded.append(secondChar)
@@ -168,12 +176,12 @@ extension Base32 {
         return String(decoding: encoded, as: Unicode.UTF8.self)
     }
     
-    private static func encode(firstByte: UInt8) -> UInt8 {
+    private static func encode(alphabet: [UInt8], firstByte: UInt8) -> UInt8 {
         let index = firstByte >> 3
         return alphabet[Int(index)]
     }
     
-    private static func encode(firstByte: UInt8, secondByte: UInt8?) -> UInt8 {
+    private static func encode(alphabet: [UInt8], firstByte: UInt8, secondByte: UInt8?) -> UInt8 {
         var index = (firstByte & 0b00000111) << 2
         
         if let secondByte = secondByte {
@@ -183,7 +191,7 @@ extension Base32 {
         return alphabet[Int(index)]
     }
     
-    private static func encode(secondByte: UInt8?) -> UInt8 {
+    private static func encode(alphabet: [UInt8], secondByte: UInt8?) -> UInt8 {
         guard let secondByte = secondByte else {
             return Base32.encodePaddingCharacter
         }
@@ -192,7 +200,7 @@ extension Base32 {
         return alphabet[Int(index)]
     }
     
-    private static func encode(secondByte: UInt8?, thirdByte: UInt8?) -> UInt8 {
+    private static func encode(alphabet: [UInt8], secondByte: UInt8?, thirdByte: UInt8?) -> UInt8 {
         guard let secondByte = secondByte else {
             return Base32.encodePaddingCharacter
         }
@@ -206,7 +214,7 @@ extension Base32 {
         return alphabet[Int(index)]
     }
     
-    private static func encode(thirdByte: UInt8?, fourthByte: UInt8?) -> UInt8 {
+    private static func encode(alphabet: [UInt8], thirdByte: UInt8?, fourthByte: UInt8?) -> UInt8 {
         guard let thirdByte = thirdByte else {
             return Base32.encodePaddingCharacter
         }
@@ -220,7 +228,7 @@ extension Base32 {
         return alphabet[Int(index)]
     }
     
-    private static func encode(fourthByte: UInt8?) -> UInt8 {
+    private static func encode(alphabet: [UInt8], fourthByte: UInt8?) -> UInt8 {
         guard let fourthByte = fourthByte else {
             return Base32.encodePaddingCharacter
         }
@@ -229,7 +237,7 @@ extension Base32 {
         return alphabet[Int(index)]
     }
     
-    private static func encode(fourthByte: UInt8?, fifthByte: UInt8?) -> UInt8 {
+    private static func encode(alphabet: [UInt8], fourthByte: UInt8?, fifthByte: UInt8?) -> UInt8 {
         guard let fourthByte = fourthByte else {
             return Base32.encodePaddingCharacter
         }
@@ -243,7 +251,7 @@ extension Base32 {
         return alphabet[Int(index)]
     }
     
-    private static func encode(fifthByte: UInt8?) -> UInt8 {
+    private static func encode(alphabet: [UInt8], fifthByte: UInt8?) -> UInt8 {
         guard let fifthByte = fifthByte else {
             return Base32.encodePaddingCharacter
         }

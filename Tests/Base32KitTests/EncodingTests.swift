@@ -79,4 +79,21 @@ final class EncodingTests: XCTestCase {
             XCTAssertEqual(encoded, expected, "Input '\(input)' could not be encoded correctly. Expected: \(expected), Actual: \(encoded).")
         }
     }
+    
+    func testHexRFC4648TestVectors() {
+        let stringsToEncode: [String: String] = [
+            "": "",
+            "f": "CO======",
+            "fo": "CPNG====",
+            "foo": "CPNMU===",
+            "foob": "CPNMUOG=",
+            "fooba": "CPNMUOJ1",
+            "foobar": "CPNMUOJ1E8======"
+        ]
+        
+        for (stringToEncode, expected) in stringsToEncode {
+            let encoded = Base32.encodeHex(string: stringToEncode)
+            XCTAssertEqual(encoded, expected, "Input '\(stringToEncode)' could not be encoded correctly. Expected: \(expected), Actual: \(encoded).")
+        }
+    }
 }
