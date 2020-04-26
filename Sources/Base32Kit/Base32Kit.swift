@@ -65,7 +65,7 @@ public struct Base32 {
             throw Base32.DecodingError.invalidLength
         }
         
-        if let invalidCharacter = invalidCharacters(in: string) {
+        if let invalidCharacter = invalidCharacters(in: string, alphabet: alphabetDecodeTable) {
             throw Base32.DecodingError.invalidCharacter(invalidCharacter)
         }
         
@@ -73,9 +73,31 @@ public struct Base32 {
             throw Base32.DecodingError.invalidPaddingCharacters
         }
         
-        return try decode(bytes: Array(string.utf8))
+        return try decode(bytes: Array(string.utf8), alphabet: alphabetDecodeTable)
     }
     
+    public static func decodeHex(string: String) throws -> String {
+        guard !string.isEmpty else {
+            return ""
+        }
+        
+        guard string.count % 8 == 0 else {
+            throw Base32.DecodingError.invalidLength
+        }
+        
+        if let invalidCharacter = invalidCharacters(in: string, alphabet: decodeBase32hex) {
+            throw Base32.DecodingError.invalidCharacter(invalidCharacter)
+        }
+        
+        if invalidPadding(in: string) {
+            throw Base32.DecodingError.invalidPaddingCharacters
+        }
+        
+        return try decode(bytes: Array(string.utf8), alphabet: decodeBase32hex)
+    }
+}
+
+extension Base32 {
     private static func invalidPadding(in string: String) -> Bool {
         // The String is never allowed to start with a padding character:
         if string.starts(with: "=") {
@@ -108,7 +130,7 @@ public struct Base32 {
     ///
     /// - Parameters:
     ///    - in: the Base 32 encoded string to check for illegal characters.
-    private static func invalidCharacters(in string: String) -> [Character]? {
+    private static func invalidCharacters(in string: String, alphabet: [UInt8]) -> [Character]? {
         var invalidCharacters: [Character] = []
         
         for character in string {
@@ -122,11 +144,11 @@ public struct Base32 {
                 continue
             }
             
-            if ascii == encodePaddingCharacter {
+            if ascii == Alphabet.encodePaddingCharacter {
                 continue
             }
             
-            let value = alphabetDecodeTable[Int(ascii)]
+            let value = alphabet[Int(ascii)]
             if value <= 31 {
                 continue
             }
@@ -136,7 +158,6 @@ public struct Base32 {
         
         return invalidCharacters.isEmpty ? nil : invalidCharacters
     }
-
 }
 
 // MARK: Encoding (Private)
@@ -193,7 +214,7 @@ extension Base32 {
     
     private static func encode(alphabet: [UInt8], secondByte: UInt8?) -> UInt8 {
         guard let secondByte = secondByte else {
-            return Base32.encodePaddingCharacter
+            return Alphabet.encodePaddingCharacter
         }
         
         let index = (secondByte & 0b00111110) >> 1
@@ -202,7 +223,7 @@ extension Base32 {
     
     private static func encode(alphabet: [UInt8], secondByte: UInt8?, thirdByte: UInt8?) -> UInt8 {
         guard let secondByte = secondByte else {
-            return Base32.encodePaddingCharacter
+            return Alphabet.encodePaddingCharacter
         }
         
         var index = (secondByte & 0b00000001) << 4
@@ -216,7 +237,7 @@ extension Base32 {
     
     private static func encode(alphabet: [UInt8], thirdByte: UInt8?, fourthByte: UInt8?) -> UInt8 {
         guard let thirdByte = thirdByte else {
-            return Base32.encodePaddingCharacter
+            return Alphabet.encodePaddingCharacter
         }
         
         var index = (thirdByte & 0b00001111) << 1
@@ -230,7 +251,7 @@ extension Base32 {
     
     private static func encode(alphabet: [UInt8], fourthByte: UInt8?) -> UInt8 {
         guard let fourthByte = fourthByte else {
-            return Base32.encodePaddingCharacter
+            return Alphabet.encodePaddingCharacter
         }
         
         let index = (fourthByte & 0b01111100) >> 2
@@ -239,7 +260,7 @@ extension Base32 {
     
     private static func encode(alphabet: [UInt8], fourthByte: UInt8?, fifthByte: UInt8?) -> UInt8 {
         guard let fourthByte = fourthByte else {
-            return Base32.encodePaddingCharacter
+            return Alphabet.encodePaddingCharacter
         }
         
         var index = (fourthByte & 0b00000011) << 3
@@ -253,7 +274,7 @@ extension Base32 {
     
     private static func encode(alphabet: [UInt8], fifthByte: UInt8?) -> UInt8 {
         guard let fifthByte = fifthByte else {
-            return Base32.encodePaddingCharacter
+            return Alphabet.encodePaddingCharacter
         }
         
         let index = fifthByte & 0b00011111
@@ -264,7 +285,7 @@ extension Base32 {
 // MARK: Decoding (Private)
 extension Base32 {
     
-    private static func decode<Buffer: Collection>(bytes: Buffer) throws -> String where Buffer.Element == UInt8 {
+    private static func decode<Buffer: Collection>(bytes: Buffer, alphabet: [UInt8]) throws -> String where Buffer.Element == UInt8 {
         let characterCount = bytes.count
         let inputBlocks = characterCount / 8
         let blocksWithoutPadding = inputBlocks - 1
@@ -273,14 +294,14 @@ extension Base32 {
         var input = bytes.makeIterator()
         
         for _ in 0..<blocksWithoutPadding {
-            let firstValue = try input.nextValue()
-            let secondValue = try input.nextValue()
-            let thirdValue = try input.nextValue()
-            let fourthValue = try input.nextValue()
-            let fifthValue = try input.nextValue()
-            let sixthValue = try input.nextValue()
-            let seventhValue = try input.nextValue()
-            let eightValue = try input.nextValue()
+            let firstValue = try input.nextValue(alphabet: alphabet)
+            let secondValue = try input.nextValue(alphabet: alphabet)
+            let thirdValue = try input.nextValue(alphabet: alphabet)
+            let fourthValue = try input.nextValue(alphabet: alphabet)
+            let fifthValue = try input.nextValue(alphabet: alphabet)
+            let sixthValue = try input.nextValue(alphabet: alphabet)
+            let seventhValue = try input.nextValue(alphabet: alphabet)
+            let eightValue = try input.nextValue(alphabet: alphabet)
             
             output.append((firstValue << 3) | (secondValue >> 2))
             output.append((secondValue << 6) | (thirdValue << 1) | (fourthValue >> 4))
@@ -289,36 +310,36 @@ extension Base32 {
             output.append((seventhValue << 5) | eightValue)
         }
         
-        let firstByte = try input.nextValue()
-        let secondByte = try input.nextValue()
+        let firstByte = try input.nextValue(alphabet: alphabet)
+        let secondByte = try input.nextValue(alphabet: alphabet)
         
         let value = (firstByte << 3) | (secondByte >> 2)
         output.append(value)
         
-        let thirdByte = input.nextValueOrEmpty()
-        let fourthByte = input.nextValueOrEmpty()
+        let thirdByte = input.nextValueOrEmpty(alphabet: alphabet)
+        let fourthByte = input.nextValueOrEmpty(alphabet: alphabet)
         
         if thirdByte != nil && fourthByte != nil {
             let value = (secondByte << 6) | (thirdByte! << 1) | (fourthByte! >> 4)
             output.append(value)
         }
         
-        let fifthByte = input.nextValueOrEmpty()
+        let fifthByte = input.nextValueOrEmpty(alphabet: alphabet)
         
         if fifthByte != nil {
             let value = (fourthByte! << 4) | (fifthByte! >> 1)
             output.append(value)
         }
         
-        let sixthByte = input.nextValueOrEmpty()
-        let seventhByte = input.nextValueOrEmpty()
+        let sixthByte = input.nextValueOrEmpty(alphabet: alphabet)
+        let seventhByte = input.nextValueOrEmpty(alphabet: alphabet)
         
         if sixthByte != nil && seventhByte != nil {
             let value = (fifthByte! << 7) | (sixthByte! << 2) | (seventhByte! >> 3)
             output.append(value)
         }
         
-        let eightByte = input.nextValueOrEmpty()
+        let eightByte = input.nextValueOrEmpty(alphabet: alphabet)
         if eightByte != nil {
             let value = (seventhByte! << 5) | eightByte!
             output.append(value)
@@ -330,12 +351,12 @@ extension Base32 {
 
 extension IteratorProtocol where Self.Element == UInt8 {
 
-    mutating func nextValue() throws -> UInt8 {
+    mutating func nextValue(alphabet: [UInt8]) throws -> UInt8 {
         guard let ascii = self.next() else {
             throw Base32.DecodingError.missingCharacter
         }
         
-        let value = Base32.alphabetDecodeTable[Int(ascii)]
+        let value = alphabet[Int(ascii)]
         
         if value < 31 {
             return value
@@ -344,16 +365,16 @@ extension IteratorProtocol where Self.Element == UInt8 {
         throw Base32.DecodingError.invalidCharacter([Character.init(Unicode.Scalar.init(ascii))])
     }
     
-    mutating func nextValueOrEmpty() -> UInt8? {
+    mutating func nextValueOrEmpty(alphabet: [UInt8]) -> UInt8? {
         guard let ascii = self.next() else {
             return nil
         }
         
-        if ascii == Base32.encodePaddingCharacter {
+        if ascii == Alphabet.encodePaddingCharacter {
             return nil
         }
         
-        let value = Base32.alphabetDecodeTable[Int(ascii)]
+        let value = alphabet[Int(ascii)]
         
         if value < 31 {
             return value

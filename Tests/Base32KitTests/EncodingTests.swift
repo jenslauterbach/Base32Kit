@@ -4,9 +4,18 @@ import XCTest
 final class EncodingTests: XCTestCase {
     
     public static var allTests = [
+        // Normal alphabet tests:
         ("testRFC4648TestVectors", testRFC4648TestVectors),
-        ("testCapacityFormula", testCapacityFormula),
-        ("testEmoji", testEmoji)
+        ("testSentences", testSentences),
+        ("testEmoji", testEmoji),
+        
+        // Hex alphabet tests:
+        ("testHexRFC4648TestVectors", testHexRFC4648TestVectors),
+        ("testHexSentences", testHexSentences),
+        ("testHexEmoji", testHexEmoji),
+        
+        // General tests:
+        ("testCapacityFormula", testCapacityFormula)
     ]
     
     func testRFC4648TestVectors() {
@@ -94,6 +103,39 @@ final class EncodingTests: XCTestCase {
         for (stringToEncode, expected) in stringsToEncode {
             let encoded = Base32.encodeHex(string: stringToEncode)
             XCTAssertEqual(encoded, expected, "Input '\(stringToEncode)' could not be encoded correctly. Expected: \(expected), Actual: \(encoded).")
+        }
+    }
+    
+    func testHexSentences() {
+        // See: https://en.wikipedia.org/wiki/Harvard_sentences
+        let sentences: [String: String] = [
+            "Oak is strong and also gives shade.": "9TGMM839ECG76T3IDTN6E831DPI20OBCEDNI0PR9EPIN683JD1GM8P9E",
+            "Cats and dogs each hate the other.": "8DGN8SP0C5N68834DTJN6835C5HMG838C5Q6A83KD1II0RRKD1IN4BG=",
+            "The pipe began to rust while new.": "AHK6A83GD5O6A832CLJM2RH0EHNI0SJLEDQ20TR8D5M6A83ECLRIS===",
+            "Open the crate but don't break the glass.": "9TO6ARH0EHK6A833E9GN8P90C9QN8834DTN2ET10C9P6AOBB41Q6GP90CTM62SRJ5O======",
+            "Add the sum to the product of these three.": "85I6883KD1II0SRLDKG78RP0EHK6A83GE9NM8TB3EGG6UPH0EHK6ASR541Q6GSJ5CKN0====",
+            "Thieves who rob friends deserve jail.": "AHK6IPBMCLPI0TR8DSG74RR241J74QB5DPI76834CLPMASJMCKG6KOB9DGN0====",
+            "The ripe taste of cheese improves with age.": "AHK6A83ID5O6A83KC5PN8P90DTJ20OR8CLIN6P90D5MN0SJFEPIN683ND5Q6G831CTIIS===",
+            "Act on these orders with great speed.": "85HN883FDOG78Q35EDII0RRICHIN4SP0ETKN8Q10CTP6AOBK41PN0PB5CGN0====",
+            "The hog crawled under the high fence.": "AHK6A838DTJI0ORIC5RMOPB441QMSP35E8G78Q3541K6IPR841J6ARJ3CKN0====",
+            "Move the vat over the hot fire.": "9LNNCP90EHK6A83MC5Q20RRMCLP20T38CKG6GRRK41J6ISJ55O======"
+        ]
+        
+        for (sentence, expected) in sentences {
+            let encoded = Base32.encodeHex(string: sentence)
+            XCTAssertEqual(encoded, expected, "Input '\(sentence)' could not be encoded correctly. Expected: \(expected), Actual: \(encoded).")
+        }
+    }
+    
+    func testHexEmoji() throws {
+        let testData: [String: String] = [
+            "😀": "U2FPH00=",
+            "Hello World ❤️": "91IMOR3F41BMUSJCCGGE57D4TUS8U==="
+        ]
+        
+        for (input, expected) in testData {
+            let encoded = Base32.encodeHex(string: input)
+            XCTAssertEqual(encoded, expected, "Input '\(input)' could not be encoded correctly. Expected: \(expected), Actual: \(encoded).")
         }
     }
 }
