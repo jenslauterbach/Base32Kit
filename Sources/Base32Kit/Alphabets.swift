@@ -80,7 +80,7 @@ extension Alphabet {
 extension Base32 {
     
     private static let __: UInt8 = 255
-    static let alphabetDecodeTable: [UInt8] = [
+    static let decodeBase32: [UInt8] = [
         __,__,__,__, __,__,__,__, __,__,__,__, __,__,__,__,  // 0x00 - 0x0F
         __,__,__,__, __,__,__,__, __,__,__,__, __,__,__,__,  // 0x10 - 0x1F
         __,__,__,__, __,__,__,__, __,__,__,__, __,__,__,__,  // 0x20 - 0x2F

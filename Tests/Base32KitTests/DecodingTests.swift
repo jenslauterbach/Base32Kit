@@ -24,7 +24,7 @@ final class DecodingTests: XCTestCase {
         ("testHexLineBreaks", testHexLineBreaks),
         ("testHexMisplacedPaddingCharacter", testHexMisplacedPaddingCharacter),
         ("testHexNulCharacter", testHexNulCharacter),
-        ("testHexCaseSensitivity", testHexCaseSensitivity),
+        ("testHexCaseSensitivity", testHexCaseSensitivity)
     ]
     
     private let invalidAsciiCharacters: Set<UInt8> = {
@@ -139,17 +139,26 @@ final class DecodingTests: XCTestCase {
         }
     }
     
-    // TODO: Expand this test. There are a lot of emojis and in theory all of them could be tested. On the other hand
-    // emojis are a moving "target". Contrary to ASCII, the list of emoji "characters" is expanding every year.
     func testEmoji() {
-        let emojis: [String] = ["😀"]
+        let emojiRanges = [
+            0x1F600...0x1F636,
+            0x1F645...0x1F64F,
+            0x1F910...0x1F91F,
+            0x1F30D...0x1F52D
+        ]
         
-        for emoji in emojis {
-            let encoded = emoji + "======="
-            assert(
-                try Base32.decode(string: encoded),
-                throws: Base32.DecodingError.invalidCharacter([Character(emoji)])
-            )
+        for subRange in emojiRanges {
+            for emojiScalar in subRange {
+                guard let emoji = UnicodeScalar(emojiScalar) else {
+                    continue
+                }
+                
+                let encoded = String(emoji) + "======="
+                assert(
+                    try Base32.decode(string: encoded),
+                    throws: Base32.DecodingError.invalidCharacter([Character(emoji)])
+                )
+            }
         }
     }
     
@@ -291,7 +300,6 @@ final class DecodingTests: XCTestCase {
         }
     }
     
-    // TODO: Switch alphabet
     func testHexInvalidLength() {
         let testData = generateRandomInvalidLengthStrings(count: 100, alphabet: Alphabet.base32hex)
         

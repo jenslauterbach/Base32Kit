@@ -1,32 +1,71 @@
-// MARK: Public API
+/// The `Base32` struct contains methods to encode and decode data using the Base 32 encoding as defined by [RFC 4648](https://tools.ietf.org/html/rfc4648).
+///
+/// The API supports both alphabets defined in the specification for encoding and decoding data:
+///
+/// 1. The Base 32 Alphabet (see [RFC 4648 Section 6](https://tools.ietf.org/html/rfc4648#section-6))
+/// 2. The "Extended Hex" Base 32 Alphabet (see [RFC 4648 Section 7](https://tools.ietf.org/html/rfc4648#section-7))
+///
+/// The API only supports the encoding and decoding of strings and no other data types. All the inputs are validated and the API will throw exceptions instead of
+/// ignoring illegal input.
+///
+/// All methods are `static` so no instance of the `Base32` struct needs to be created.
+///
+/// **Examples:**
+///
+/// ```
+/// let encoded = Base32.encode(string: "foobar")
+/// print(encoded) // prints "MZXW6YTBOI======"
+///
+/// let decoded = Base32.decode(string: encoded)
+/// print(decoded) // prints "foobar"
+/// ```
+///
+/// - Note: Encoding and decoding methods are not optimized and might perform badly. Use another Swift package if performance is a primary concern.
+/// - Warning: This API is still under development. APIs are subject to change and error. Do not use in production.
 public struct Base32 {
     
-    /// Encodes the given `string` with the standard Base 32 alphabet.
+    /// Encodes the given `string` with the standard Base 32 alphabet as defined in section 6 of RFC 4648.
     ///
     /// If the given `string` is empty, the encoded `String` will also be empty. The  result can contain padding (`=`), if the given `string` does not
     /// contain a multiple of 5 input characters.
     ///
-    /// Examples:
+    /// **Examples:**
     ///
-    ///     Base32.encode("")       // Result: ""
-    ///     Base32.encode("f")      // Result: "MY======"
-    ///     Base32.encode("fo")     // Result: "MZXQ===="
-    ///     Base32.encode("foo")    // Result: "MZXW6==="
-    ///     Base32.encode("foob")   // Result: "MZXW6YQ="
-    ///     Base32.encode("fooba")  // Result: "MZXW6YTB"
-    ///     Base32.encode("foobar") // Result: "MZXW6YTBOI======"
+    /// ```
+    /// let encoded = Base32.encode(string: "foobar")
+    /// print(encoded) // prints "MZXW6YTBOI======"
+    /// ```
     ///
     /// - Parameter string: The UTF8 string to encode.
     ///
     /// - Returns: Base 32 encoded `String` or empty `String` if the given `string` is empty.
+    ///
+    /// - Important: This method is case insensitive.
     public static func encode(string: String) -> String {
         guard !string.isEmpty else {
             return ""
         }
-        
+
         return encode(bytes: Array(string.utf8), alphabet: Alphabet.base32)
     }
     
+    /// Encodes the given `string` with the "Extended Hex" Base 32 alphabet as defined in section 7 of RFC 4648.
+    ///
+    /// If the given `string` is empty, the encoded `String` will also be empty. The  result can contain padding (`=`), if the given `string` does not
+    /// contain a multiple of 5 input characters.
+    ///
+    /// **Examples:**
+    ///
+    /// ```
+    /// let encoded = Base32.encodeHex(string: "foobar")
+    /// print(encoded) // prints "CPNMUOJ1E8======"
+    /// ```
+    ///
+    /// - Parameter string: The UTF8 string to encode.
+    ///
+    /// - Returns: Base 32 Hex encoded `String` or empty `String` if the given `string` is empty.
+    ///
+    /// - Important: This method is case insensitive.
     public static func encodeHex(string: String) -> String {
         guard !string.isEmpty else {
             return ""
@@ -39,23 +78,23 @@ public struct Base32 {
     ///
     /// If the given `string` is empty, the decoded `String` will also be empty. This method is case in-senstive.
     ///
-    /// Examples:
+    /// **Examples:**
     ///
-    ///     Base32.decode("")                   // Result: ""
-    ///     Base32.decode("MY======")           // Result: "f"
-    ///     Base32.decode("MZXQ====")           // Result: "fo"
-    ///     Base32.decode("MZXW6===")           // Result: "foo"
-    ///     Base32.decode("MZXW6YQ=")           // Result: "foob"
-    ///     Base32.decode("MZXW6YTB")           // Result: "fooba"
-    ///     Base32.decode("MZXW6YTBOI======")   // Result: "foobar"
+    /// ```
+    /// let decoded = Base32.decode(string: "MZXW6YTBOI======")
+    /// print(decoded) // prints "foobar"
+    /// ```
     ///
     /// - Parameter string: The UTF8 string to decode.
     ///
     /// - Returns: Decoded UTF8 string or empty `String` if the given `string` is empty.
     ///
+    /// - Important: This method is case insensitive.
+    ///
     /// - Throws:
-    ///     - `DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
-    ///     - `DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
+    ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
+    ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
+    ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
     public static func decode(string: String) throws -> String {
         guard !string.isEmpty else {
             return ""
@@ -65,7 +104,7 @@ public struct Base32 {
             throw Base32.DecodingError.invalidLength
         }
         
-        if let invalidCharacter = invalidCharacters(in: string, alphabet: alphabetDecodeTable) {
+        if let invalidCharacter = invalidCharacters(in: string, alphabet: decodeBase32) {
             throw Base32.DecodingError.invalidCharacter(invalidCharacter)
         }
         
@@ -73,9 +112,30 @@ public struct Base32 {
             throw Base32.DecodingError.invalidPaddingCharacters
         }
         
-        return try decode(bytes: Array(string.utf8), alphabet: alphabetDecodeTable)
+        return try decode(bytes: Array(string.utf8), alphabet: decodeBase32)
     }
     
+    /// Decodes the given `string` with the "Extended Hex" Base 32 alphabet.
+    ///
+    /// If the given `string` is empty, the decoded `String` will also be empty.
+    ///
+    /// **Examples:**
+    ///
+    /// ```
+    /// let decoded = Base32.decode(string: "MZXW6YTBOI======")
+    /// print(decoded) // prints "foobar"
+    /// ```
+    ///
+    /// - Parameter string: The UTF8 string to decode.
+    ///
+    /// - Returns: Decoded UTF8 string or empty `String` if the given `string` is empty.
+    ///
+    /// - Important: This method is case insensitive.
+    ///
+    /// - Throws:
+    ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
+    ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
+    ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
     public static func decodeHex(string: String) throws -> String {
         guard !string.isEmpty else {
             return ""
