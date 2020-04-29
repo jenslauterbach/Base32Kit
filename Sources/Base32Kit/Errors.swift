@@ -1,7 +1,7 @@
 extension Base32 {
     
     /// Errors that can be thrown during decoding of a Base 32 encoded string.
-    enum DecodingError: Error, Equatable {
+    public enum DecodingError: Error, Equatable {
         
         /// The `String` to decode has invalid length. A string that should be decoded should have a length that is a multiple of 8
         /// (e.g. 8 characters, 16, 24 ... 80, 96, etc.)
@@ -23,9 +23,6 @@ extension Base32 {
         /// - OK: `"MZXQ===="`
         /// - Not OK: `"M=XQ===="`
         case invalidPaddingCharacters
-        
-        /// Thrown when the encoded `String` decodes to a result that is illegal.
-        case invalidEncodedString
         
         /// Thrown when reading the encoded `String` and no character can be found at position one or two even though it should exist.
         case missingCharacter
