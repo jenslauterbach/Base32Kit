@@ -3,18 +3,11 @@
 [![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg)](https://swift.org)
 ![CI](https://github.com/jenslauterbach/Base32Kit/workflows/Build%20and%20Test/badge.svg)
 
-> :warning: Disclaimer: This library is in its early development phase and should not yet be used in production. All the code in this repository might change, including its APIs.
+> Disclaimer: This library is in its early development phase and should not yet be used in production. All the code in this repository might change, including its APIs. This library is not very well optimised. If you are looking for the absolute best performance this library is probably not for you.
 
-Base32Kit is a simple _pure_ Swift Library for the Base32 encoding as defined by [RFC 4648](https://tools.ietf.org/html/rfc4648).
+Base32Kit is a simple _pure_ Swift Library for the Base32 encoding as defined by [RFC 4648](https://tools.ietf.org/html/rfc4648) that is implemented _without_ Apples Foundation framework.
 
-The main goals of this library are:
-
-1. RFC 4648 compliance
-2. Easy to read and understand
-3. Well tested
-4. Cross-platform (run everywhere where Swift runs)
-
-This library is not very well optimised. If you are looking for the absolute best performance this library is probably not for you.
+API reference documentation is available at https://jenslauterbach.github.io/Base32Kit/
 
 ## Table of Contents
 
@@ -23,6 +16,7 @@ This library is not very well optimised. If you are looking for the absolute bes
 - [Usage](#usage)
   - [Encoding](#encoding)
   - [Decoding](#decoding)
+- [Design Goals](#design-goals)
 - [Alternatives](#alternatives)
 - [Versioning](#versioning)
 - [Authors](#authors)
@@ -41,7 +35,7 @@ import PackageDescription
 
 let package = Package(
     dependencies: [
-        .package(url: "https://github.com/jenslauterbach/Base32Kit.git", from: "0.1.0"),
+        .package(url: "https://github.com/jenslauterbach/Base32Kit.git", from: "0.2.0"),
     ]
 )
 ```
@@ -53,28 +47,80 @@ let package = Package(
 ```Swift
 import Base32Kit
 
-let encoded = Base32.decode(string: "foobar")
+let encoded = Base32.encode(string: "foobar")
 print(encoded) // prints MZXW6YTBOI======
 ```
 
 ### Decoding
 
+All `decode*` methods can throw an error. In general you have two options of dealing with this. If you are not interested in the error and just need to decode the value or do "nothing", you can use a simple `try?` statement:
+
 ```Swift
 import Base32Kit
 
-let decoded = Base32.decode(string: "MZXW6YTBOI======")
-print(decoded) // prints foobar
+if let decoded = try? Base32.decode(string: "MZXW6YTBOI======") {
+    print(decoded) // prints "foobar"
+}
 ```
+
+If you want to handle any possible error in a more generlised way, you can use the following simple `do-catch` statement:
+
+```Swift
+import Base32Kit
+
+do {
+    let decoded = try Base32.decode(string: "MZXW6YTBOI======")
+    print(decoded) // prints "foobar"
+} catch {
+    print("Error!")
+}
+```
+
+The above code does not allow to handle all the different errors that may be thrown separately. To handle errors separately, you can use an extended version of the above `do-catch` statement:
+
+```Swift
+import Base32Kit
+
+do {
+    let decoded = try Base32.decode(string: "MZXW6YTBOI======")
+    print(decoded) // prints "foobar"
+} catch Base32.DecodingError.invalidLength {
+    print("Encoded string has invalid length!")
+} catch Base32.DecodingError.invalidPaddingCharacters {
+    print("Encoded string uses illegal padding characters!")
+} catch Base32.DecodingError.invalidCharacter(let illegalCharacters) {
+    print("Encoded string contained the following illegal characters: \(illegalCharacters)")
+} catch Base32.DecodingError.missingCharacter {
+    print("During decoding there was an unexpected missing character!")
+} catch {
+    print("Error!")
+}
+```
+
+## Design Goals
+
+[(Back to top)](#table-of-contents)
+
+The primary design goals of this Swift package are:
+
+1. 100% RFC 4648 compliance.
+2. Cross-platform (run everywhere where Swift runs).
+2. The code is easy to read and understand.
+
+Furthermore, we try to create a comprehensive test suite to verify the package with a big variety of test data on all supported platforms.
 
 ## Alternatives
 
 [(Back to top)](#table-of-contents)
 
+[Base32](https://github.com/norio-nomura/Base32) by [Norio Nomura](https://github.com/norio-nomura)
+[Base32](https://github.com/std-swift/Base32) by [std-swift](https://github.com/std-swift)
+
 ## Versioning
 
 [(Back to top)](#table-of-contents)
 
-We use SemVer for versioning. For the versions available, see the [tags on this repository]().
+We use SemVer for versioning. For the versions available, see the [releases](https://github.com/jenslauterbach/Base32Kit/releases) page.
 
 ## Authors
 
@@ -86,7 +132,7 @@ We use SemVer for versioning. For the versions available, see the [tags on this 
 
 [(Back to top)](#table-of-contents)
 
-This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
+This project is licensed under the Apache 2.0 License - see the [LICENSE](https://github.com/jenslauterbach/Base32Kit/blob/master/LICENSE) file for details.
 
 ## Acknowledgments
 
