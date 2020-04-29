@@ -113,8 +113,8 @@ Furthermore, we try to create a comprehensive test suite to verify the package w
 
 [(Back to top)](#table-of-contents)
 
-[Base32](https://github.com/norio-nomura/Base32) by [Norio Nomura](https://github.com/norio-nomura)
-[Base32](https://github.com/std-swift/Base32) by [std-swift](https://github.com/std-swift)
+- [Base32](https://github.com/norio-nomura/Base32) by [Norio Nomura](https://github.com/norio-nomura)
+- [Base32](https://github.com/std-swift/Base32) by [std-swift](https://github.com/std-swift)
 
 ## Versioning
 
