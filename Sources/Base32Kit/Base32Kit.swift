@@ -199,11 +199,6 @@ extension Base32 {
         var invalidCharacters: [Character] = []
         
         for character in string {
-            if !character.isASCII {
-                invalidCharacters.append(character as Character)
-                continue
-            }
-            
             guard let ascii = character.asciiValue else {
                 invalidCharacters.append(character as Character)
                 continue
