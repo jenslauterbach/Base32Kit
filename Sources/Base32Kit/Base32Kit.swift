@@ -97,6 +97,7 @@ public struct Base32 {
     ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
     ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
     ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
+    ///     - `Base32.DecodingError.missingCharacter` if no character can be read even though there a character is expected.
     public static func decode(string: String) throws -> String {
         guard !string.isEmpty else {
             return ""
@@ -139,6 +140,7 @@ public struct Base32 {
     ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
     ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
     ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
+    ///     - `Base32.DecodingError.missingCharacter` if no character can be read even though there a character is expected.
     public static func decodeHex(string: String) throws -> String {
         guard !string.isEmpty else {
             return ""
