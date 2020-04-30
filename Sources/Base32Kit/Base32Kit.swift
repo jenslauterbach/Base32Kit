@@ -16,8 +16,9 @@
 /// let encoded = Base32.encode(string: "foobar")
 /// print(encoded) // prints "MZXW6YTBOI======"
 ///
-/// let decoded = Base32.decode(string: encoded)
-/// print(decoded) // prints "foobar"
+/// if let decoded = try? Base32.decode(string: encoded) {
+///     print(decoded) // prints "foobar"
+/// }
 /// ```
 ///
 /// - Note: Encoding and decoding methods are not optimized and might perform badly. Use another Swift package if performance is a primary concern.
@@ -81,8 +82,9 @@ public struct Base32 {
     /// **Examples:**
     ///
     /// ```
-    /// let decoded = Base32.decode(string: "MZXW6YTBOI======")
-    /// print(decoded) // prints "foobar"
+    /// if let decoded = try? Base32.decode(string: "MZXW6YTBOI======") {
+    ///     print(decoded) // prints "foobar"
+    /// }
     /// ```
     ///
     /// - Parameter string: The UTF8 string to decode.
@@ -95,6 +97,7 @@ public struct Base32 {
     ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
     ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
     ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
+    ///     - `Base32.DecodingError.missingCharacter` if no character can be read even though there a character is expected.
     public static func decode(string: String) throws -> String {
         guard !string.isEmpty else {
             return ""
@@ -122,8 +125,9 @@ public struct Base32 {
     /// **Examples:**
     ///
     /// ```
-    /// let decoded = Base32.decode(string: "MZXW6YTBOI======")
-    /// print(decoded) // prints "foobar"
+    /// if let decoded = Base32.decodeHex(string: "CPNMUOJ1E8======") {
+    ///     print(decoded) // prints "foobar"
+    /// }
     /// ```
     ///
     /// - Parameter string: The UTF8 string to decode.
@@ -136,6 +140,7 @@ public struct Base32 {
     ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
     ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
     ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
+    ///     - `Base32.DecodingError.missingCharacter` if no character can be read even though there a character is expected.
     public static func decodeHex(string: String) throws -> String {
         guard !string.isEmpty else {
             return ""
@@ -194,11 +199,6 @@ extension Base32 {
         var invalidCharacters: [Character] = []
         
         for character in string {
-            if !character.isASCII {
-                invalidCharacters.append(character as Character)
-                continue
-            }
-            
             guard let ascii = character.asciiValue else {
                 invalidCharacters.append(character as Character)
                 continue
@@ -220,7 +220,6 @@ extension Base32 {
     }
 }
 
-// MARK: Encoding (Private)
 extension Base32 {
     
     private static func encode<Buffer: Collection>(bytes: Buffer, alphabet: [UInt8]) -> String where Buffer.Element == UInt8 {
@@ -342,7 +341,6 @@ extension Base32 {
     }
 }
 
-// MARK: Decoding (Private)
 extension Base32 {
     
     private static func decode<Buffer: Collection>(bytes: Buffer, alphabet: [UInt8]) throws -> String where Buffer.Element == UInt8 {
