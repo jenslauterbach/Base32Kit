@@ -16,8 +16,9 @@
 /// let encoded = Base32.encode(string: "foobar")
 /// print(encoded) // prints "MZXW6YTBOI======"
 ///
-/// let decoded = Base32.decode(string: encoded)
-/// print(decoded) // prints "foobar"
+/// if let decoded = try? Base32.decode(string: encoded) {
+///     print(decoded) // prints "foobar"
+/// }
 /// ```
 ///
 /// - Note: Encoding and decoding methods are not optimized and might perform badly. Use another Swift package if performance is a primary concern.
@@ -81,8 +82,9 @@ public struct Base32 {
     /// **Examples:**
     ///
     /// ```
-    /// let decoded = Base32.decode(string: "MZXW6YTBOI======")
-    /// print(decoded) // prints "foobar"
+    /// if let decoded = try? Base32.decode(string: "MZXW6YTBOI======") {
+    ///     print(decoded) // prints "foobar"
+    /// }
     /// ```
     ///
     /// - Parameter string: The UTF8 string to decode.
@@ -122,8 +124,9 @@ public struct Base32 {
     /// **Examples:**
     ///
     /// ```
-    /// let decoded = Base32.decode(string: "MZXW6YTBOI======")
-    /// print(decoded) // prints "foobar"
+    /// if let decoded = Base32.decodeHex(string: "CPNMUOJ1E8======") {
+    ///     print(decoded) // prints "foobar"
+    /// }
     /// ```
     ///
     /// - Parameter string: The UTF8 string to decode.
