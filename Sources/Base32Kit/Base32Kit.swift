@@ -220,7 +220,6 @@ extension Base32 {
     }
 }
 
-// MARK: Encoding (Private)
 extension Base32 {
     
     private static func encode<Buffer: Collection>(bytes: Buffer, alphabet: [UInt8]) -> String where Buffer.Element == UInt8 {
@@ -342,7 +341,6 @@ extension Base32 {
     }
 }
 
-// MARK: Decoding (Private)
 extension Base32 {
     
     private static func decode<Buffer: Collection>(bytes: Buffer, alphabet: [UInt8]) throws -> String where Buffer.Element == UInt8 {
