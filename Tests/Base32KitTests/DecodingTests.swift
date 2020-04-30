@@ -152,7 +152,7 @@ final class DecodingTests: XCTestCase {
                 guard let emoji = UnicodeScalar(emojiScalar) else {
                     continue
                 }
-                
+
                 let encoded = String(emoji) + "======="
                 assert(
                     try Base32.decode(string: encoded),
@@ -323,14 +323,25 @@ final class DecodingTests: XCTestCase {
     }
     
     func testHexEmoji() {
-        let emojis: [String] = ["😀"]
+        let emojiRanges = [
+            0x1F600...0x1F636,
+            0x1F645...0x1F64F,
+            0x1F910...0x1F91F,
+            0x1F30D...0x1F52D
+        ]
         
-        for emoji in emojis {
-            let encoded = emoji + "======="
-            assert(
-                try Base32.decodeHex(string: encoded),
-                throws: Base32.DecodingError.invalidCharacter([Character(emoji)])
-            )
+        for subRange in emojiRanges {
+            for emojiScalar in subRange {
+                guard let emoji = UnicodeScalar(emojiScalar) else {
+                    continue
+                }
+
+                let encoded = String(emoji) + "======="
+                assert(
+                    try Base32.decodeHex(string: encoded),
+                    throws: Base32.DecodingError.invalidCharacter([Character(emoji)])
+                )
+            }
         }
     }
     
