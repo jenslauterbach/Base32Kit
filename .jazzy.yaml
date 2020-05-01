@@ -1,0 +1,16 @@
+# Metadata:
+module: Base32Kit
+author: Jens Lauterbach
+author_url: https://github.com/jenslauterbach
+github_url: https://github.com/jenslauterbach/Base32Kit
+module_version: 0.2.1
+
+# Generation config:
+clean: true
+swift_build_tool: spm
+build_tool_arguments: [
+  "-Xswiftc",
+  "-swift-version",
+  "-Xswiftc",
+  "5"
+]
