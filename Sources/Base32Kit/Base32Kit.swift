@@ -37,13 +37,13 @@ public struct Base32 {
     /// print(encoded) // prints "MZXW6YTBOI======"
     /// ```
     ///
-    /// - Parameter string: The UTF8 string to encode.
+    /// - Parameter string: The  string to encode.
     ///
     /// - Returns: Base 32 encoded `String` or empty `String` if the given `string` is empty.
     ///
     /// - Important: This method is case insensitive.
     public static func encode(string: String) -> String {
-        guard !string.isEmpty else {
+        if string.isEmpty {
             return ""
         }
 
@@ -62,13 +62,13 @@ public struct Base32 {
     /// print(encoded) // prints "CPNMUOJ1E8======"
     /// ```
     ///
-    /// - Parameter string: The UTF8 string to encode.
+    /// - Parameter string: The string to encode.
     ///
     /// - Returns: Base 32 Hex encoded `String` or empty `String` if the given `string` is empty.
     ///
     /// - Important: This method is case insensitive.
     public static func encodeHex(string: String) -> String {
-        guard !string.isEmpty else {
+        if string.isEmpty {
             return ""
         }
         
@@ -87,19 +87,19 @@ public struct Base32 {
     /// }
     /// ```
     ///
-    /// - Parameter string: The UTF8 string to decode.
+    /// - Parameter string: The  string to decode.
     ///
-    /// - Returns: Decoded UTF8 string or empty `String` if the given `string` is empty.
+    /// - Returns: Decoded string or empty `String` if the given `string` is empty.
     ///
     /// - Important: This method is case insensitive.
     ///
     /// - Throws:
     ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
-    ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
+    ///     - `Base32.DecodingError.illegalCharactersFound` if the encoded string contains one or more illegal characters.
     ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
     ///     - `Base32.DecodingError.missingCharacter` if no character can be read even though there a character is expected.
     public static func decode(string: String) throws -> String {
-        guard !string.isEmpty else {
+        if string.isEmpty {
             return ""
         }
         
@@ -107,8 +107,8 @@ public struct Base32 {
             throw Base32.DecodingError.invalidLength
         }
         
-        if let invalidCharacter = invalidCharacters(in: string, alphabet: decodeBase32) {
-            throw Base32.DecodingError.invalidCharacter(invalidCharacter)
+        if let illegalCharacters = findIllegalCharacters(in: string, legalCharacters: "ABCDEFGHIJKLMNOPQRSRTUVWXYZabcdefghiklmnopqrstuvwxyz234567=") {
+            throw Base32.DecodingError.illegalCharactersFound(illegalCharacters)
         }
         
         if invalidPadding(in: string) {
@@ -125,24 +125,24 @@ public struct Base32 {
     /// **Examples:**
     ///
     /// ```
-    /// if let decoded = Base32.decodeHex(string: "CPNMUOJ1E8======") {
+    /// if let decoded = try? Base32.decodeHex(string: "CPNMUOJ1E8======") {
     ///     print(decoded) // prints "foobar"
     /// }
     /// ```
     ///
-    /// - Parameter string: The UTF8 string to decode.
+    /// - Parameter string: The string to decode.
     ///
-    /// - Returns: Decoded UTF8 string or empty `String` if the given `string` is empty.
+    /// - Returns: Decoded  string or empty `String` if the given `string` is empty.
     ///
     /// - Important: This method is case insensitive.
     ///
     /// - Throws:
     ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
-    ///     - `Base32.DecodingError.invalidCharacter` if the encoded string contains one or more invalid characters.
+    ///     - `Base32.DecodingError.illegalCharactersFound` if the encoded string contains one or more illegal characters.
     ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
     ///     - `Base32.DecodingError.missingCharacter` if no character can be read even though there a character is expected.
     public static func decodeHex(string: String) throws -> String {
-        guard !string.isEmpty else {
+        if string.isEmpty {
             return ""
         }
         
@@ -150,8 +150,8 @@ public struct Base32 {
             throw Base32.DecodingError.invalidLength
         }
         
-        if let invalidCharacter = invalidCharacters(in: string, alphabet: decodeBase32hex) {
-            throw Base32.DecodingError.invalidCharacter(invalidCharacter)
+        if let illegalCharacters = findIllegalCharacters(in: string, legalCharacters: "ABCDEFGHIJKLMNOPQRSTUVabcdefghijklmnopqrstuv0123456789=") {
+            throw Base32.DecodingError.illegalCharactersFound(illegalCharacters)
         }
         
         if invalidPadding(in: string) {
@@ -177,46 +177,18 @@ extension Base32 {
         return false
     }
     
-    /// Validates that the given Base 32 encoded string contains only legal characters.
+    /// Returns a `Set` of characters that is in the given `string` but not in the given `legalCharacters`.
     ///
-    /// Legal characters are as defined by RFC 4648 are:
-    ///
-    /// ```
-    /// A, B, C, D, E, F, G, H,
-    /// I, J, K, L, M, N, O, P,
-    /// Q, R, S, T, U, V, W, X,
-    /// Y, Z, 2, 3, 4, 5, 6, 7
-    /// ```
-    ///
-    /// Missing from this list is the number zero (`0`), number one (`1`), number eight (`8`) and number nine (`9`). This was done to reduce confusion.
-    /// Numbers like zero can look very much like the character `O` (uppercase).
-    ///
-    /// In addition to those characters the lowercased variant of those characters are allowed as well.
+    /// If no illegal characters were found the returned `Set` is `nil`.
     ///
     /// - Parameters:
-    ///    - in: the Base 32 encoded string to check for illegal characters.
-    private static func invalidCharacters(in string: String, alphabet: [UInt8]) -> [Character]? {
-        var invalidCharacters: [Character] = []
-        
-        for character in string {
-            guard let ascii = character.asciiValue else {
-                invalidCharacters.append(character as Character)
-                continue
-            }
-            
-            if ascii == Alphabet.encodePaddingCharacter {
-                continue
-            }
-            
-            let value = alphabet[Int(ascii)]
-            if value <= 31 {
-                continue
-            }
-            
-            invalidCharacters.append(character as Character)
-        }
-        
-        return invalidCharacters.isEmpty ? nil : invalidCharacters
+    ///     - string: the `String` in to check for illegal characters.
+    ///     - legalCharacters: a `String` that contains all legal characters.
+    ///
+    /// - Returns: Set of illegal characters found in the given `string` or `nil`.
+    private static func findIllegalCharacters(in string: String, legalCharacters: String) -> Set<Character>? {
+        let illegalCharacters = string.filter{ !legalCharacters.contains($0) }
+        return illegalCharacters.isEmpty ? nil : Set<Character>(illegalCharacters)
     }
 }
 
@@ -420,7 +392,7 @@ extension IteratorProtocol where Self.Element == UInt8 {
             return value
         }
         
-        throw Base32.DecodingError.invalidCharacter([Character.init(Unicode.Scalar.init(ascii))])
+        throw Base32.DecodingError.illegalCharactersFound([Character.init(Unicode.Scalar.init(ascii))])
     }
     
     mutating func nextValueOrEmpty(alphabet: [UInt8]) -> UInt8? {

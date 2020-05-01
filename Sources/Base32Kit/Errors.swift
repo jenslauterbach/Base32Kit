@@ -7,13 +7,21 @@ extension Base32 {
         /// (e.g. 8 characters, 16, 24 ... 80, 96, etc.)
         case invalidLength
         
-        /// Thrown when the encoded `String` contains invalid characters.
+        /// Thrown when the encoded `String` contains illegal characters.
         ///
-        /// Base 32 Encoding only supports a very limited alphabet to which input data can be encoded to. If a given _encoded_ `String` contains characters
-        /// that are not part of this alphabet, this error is thrown.
+        /// Base 32 Encoding only supports a very limited set of legal characters to which data can be encoded to. If a given _encoded_ `String` contains
+        /// characters that are not part of this alphabet, this error is thrown.
         ///
-        /// The error contains an array of all the invalid `Character`s found.
-        case invalidCharacter([Character])
+        /// The error contains a `Set` of all the illegal `Character`s that were found.
+        ///
+        /// ```
+        /// do {
+        ///     let decoded = try Base32.decode("1=======") // The character "1" is not a legal character
+        /// } catch Base32.DecodingError.illegalCharactersFound(let illegalCharacters) {
+        ///     print("The given string can not be decoded because it contains illegal characters: \(illegalCharacters)")
+        /// }
+        /// ```
+        case illegalCharactersFound(Set<Character>)
         
         /// Thrown when the encoded  `String` contains one or more invalid padding characters (`=`).
         ///
