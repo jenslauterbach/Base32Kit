@@ -134,9 +134,35 @@ final class DecodingTests: XCTestCase {
             
             assert(
                 try Base32.decode(string: encoded),
-                throws: Base32.DecodingError.invalidCharacter([Character(UnicodeScalar(character))])
+                throws: Base32.DecodingError.illegalCharactersFound([Character(UnicodeScalar(character))])
             )
         }
+    }
+    
+    func testIllegalCharactersErrorContentUniqness() {
+        // given:
+        let encoded = "11======" // "1" is a illegal character
+        
+        assert(
+            // when:
+            try Base32.decode(string: encoded),
+            
+            // then:
+            throws: Base32.DecodingError.illegalCharactersFound(Set<Character>(arrayLiteral: "1"))
+        )
+    }
+    
+    func testIllegalCharactersErrorContent() {
+        // given:
+        let encoded = "10======"
+        
+        assert(
+            // when:
+            try Base32.decode(string: encoded),
+            
+            // then:
+            throws: Base32.DecodingError.illegalCharactersFound(Set<Character>(arrayLiteral: "0", "1"))
+        )
     }
     
     func testEmoji() {
@@ -156,7 +182,7 @@ final class DecodingTests: XCTestCase {
                 let encoded = String(emoji) + "======="
                 assert(
                     try Base32.decode(string: encoded),
-                    throws: Base32.DecodingError.invalidCharacter([Character(emoji)])
+                    throws: Base32.DecodingError.illegalCharactersFound([Character(emoji)])
                 )
             }
         }
@@ -180,7 +206,7 @@ final class DecodingTests: XCTestCase {
         for (encoded, invalidCharacter) in testStrings {
             assert(
                 try Base32.decode(string: encoded),
-                throws: Base32.DecodingError.invalidCharacter([Character(invalidCharacter)])
+                throws: Base32.DecodingError.illegalCharactersFound([Character(invalidCharacter)])
             )
         }
     }
@@ -245,7 +271,7 @@ final class DecodingTests: XCTestCase {
         
         assert(
             try Base32.decode(string: encoded),
-            throws: Base32.DecodingError.invalidCharacter([Character(UnicodeScalar(0))])
+            throws: Base32.DecodingError.illegalCharactersFound([Character(UnicodeScalar(0))])
         )
     }
     
@@ -317,9 +343,37 @@ final class DecodingTests: XCTestCase {
             
             assert(
                 try Base32.decodeHex(string: encoded),
-                throws: Base32.DecodingError.invalidCharacter([Character(UnicodeScalar(character))])
+                throws: Base32.DecodingError.illegalCharactersFound([Character(UnicodeScalar(character))])
             )
         }
+    }
+    
+    /// Test to verify that the "illegalCharacters" Set that is part of the `Base32.DecodingError.illegalCharactersFound` error only contains one
+    /// "instance" of the offending character.
+    func testHexIllegalCharactersErrorContentUniqness() {
+        // given:
+        let encoded = "ZZ======" // "1" is a illegal character
+        
+        assert(
+            // when:
+            try Base32.decodeHex(string: encoded),
+            
+            // then:
+            throws: Base32.DecodingError.illegalCharactersFound(Set<Character>(arrayLiteral: "Z"))
+        )
+    }
+    
+    func testHexIllegalCharactersErrorContent() {
+        // given:
+        let encoded = "YZ======"
+        
+        assert(
+            // when:
+            try Base32.decodeHex(string: encoded),
+            
+            // then:
+            throws: Base32.DecodingError.illegalCharactersFound(Set<Character>(arrayLiteral: "Z", "Y"))
+        )
     }
     
     func testHexEmoji() {
@@ -339,7 +393,7 @@ final class DecodingTests: XCTestCase {
                 let encoded = String(emoji) + "======="
                 assert(
                     try Base32.decodeHex(string: encoded),
-                    throws: Base32.DecodingError.invalidCharacter([Character(emoji)])
+                    throws: Base32.DecodingError.illegalCharactersFound([Character(emoji)])
                 )
             }
         }
@@ -363,7 +417,7 @@ final class DecodingTests: XCTestCase {
         for (encoded, invalidCharacter) in testStrings {
             assert(
                 try Base32.decodeHex(string: encoded),
-                throws: Base32.DecodingError.invalidCharacter([Character(invalidCharacter)])
+                throws: Base32.DecodingError.illegalCharactersFound([Character(invalidCharacter)])
             )
         }
     }
@@ -421,7 +475,7 @@ final class DecodingTests: XCTestCase {
         
         assert(
             try Base32.decodeHex(string: encoded),
-            throws: Base32.DecodingError.invalidCharacter([Character(UnicodeScalar(0))])
+            throws: Base32.DecodingError.illegalCharactersFound([Character(UnicodeScalar(0))])
         )
     }
     
