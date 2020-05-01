@@ -162,16 +162,46 @@ public struct Base32 {
     }
 }
 
+// MARK: Validation
 extension Base32 {
+    
+    /// Determines whether the given `string` contains invalid padding.
+    ///
+    /// Padding is only allowed at certain places of a Base 32 encoded `String`:
+    ///
+    /// - No padding as first character.
+    /// - Only the last 6 characters can contain padding.
+    /// - The last 6 characters can only contain 6, 4, 3 or 1 padding characters.
+    ///
+    /// Valid padding:
+    ///
+    /// ```
+    /// [...]AB====== (6 x =)
+    /// [...]ABCD==== (4 x =)
+    /// [...]ABCDE=== (3 x =)
+    /// [...]ABCDEFG= (1 x =)
+    /// [...]ABCDEFGH (0 x =)
+    /// ```
+    ///
+    /// Note: `[...]` signifies possible prior encoded string fragments.
+    ///
+    /// Any padding that is not placed as above is considered invalid.
+    ///
+    /// - Parameter string: The encoded string to check for invalid padding.
+    ///
+    /// - Returns: true if the given `string` contains invalid padding, otherwise false.
+    ///
+    /// - Complexity: O(n)
     private static func invalidPadding(in string: String) -> Bool {
-        // The String is never allowed to start with a padding character:
         if string.starts(with: "=") {
             return true
         }
         
+        // Find the first padding character and check that none of the following characters is something other than a
+        // padding character.
         if let index = string.firstIndex(of: "=") {
             let substring = string[index..<string.endIndex]
-            return !substring.allSatisfy({$0 == "="})
+            return !substring.allSatisfy({ $0 == "=" })
         }
         
         return false
@@ -179,15 +209,15 @@ extension Base32 {
     
     /// Returns a `Set` of characters that is in the given `string` but not in the given `legalCharacters`.
     ///
-    /// If no illegal characters were found the returned `Set` is `nil`.
-    ///
     /// - Parameters:
     ///     - string: the `String` in to check for illegal characters.
     ///     - legalCharacters: a `String` that contains all legal characters.
     ///
-    /// - Returns: Set of illegal characters found in the given `string` or `nil`.
+    /// - Returns: Set of illegal characters found in the given `string` or `nil` if no illegal character was found.
+    ///
+    /// - Complexity: O(n)
     private static func findIllegalCharacters(in string: String, legalCharacters: String) -> Set<Character>? {
-        let illegalCharacters = string.filter{ !legalCharacters.contains($0) }
+        let illegalCharacters = string.filter({ !legalCharacters.contains($0) })
         return illegalCharacters.isEmpty ? nil : Set<Character>(illegalCharacters)
     }
 }
