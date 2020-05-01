@@ -426,13 +426,7 @@ extension IteratorProtocol where Self.Element == UInt8 {
             throw Base32.DecodingError.missingCharacter
         }
         
-        let value = alphabet[Int(ascii)]
-        
-        if value < 31 {
-            return value
-        }
-        
-        throw Base32.DecodingError.illegalCharactersFound([Character.init(Unicode.Scalar.init(ascii))])
+        return alphabet[Int(ascii)]
     }
     
     mutating func nextValueOrEmpty(alphabet: [UInt8]) -> UInt8? {
@@ -444,12 +438,6 @@ extension IteratorProtocol where Self.Element == UInt8 {
             return nil
         }
         
-        let value = alphabet[Int(ascii)]
-        
-        if value < 31 {
-            return value
-        }
-        
-        return 255
+        return alphabet[Int(ascii)]
     }
 }
