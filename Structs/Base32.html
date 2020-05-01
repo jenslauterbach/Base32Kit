@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Base32 Structure Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Struct/Base32" class="dashAnchor"></a>
+    <a title="Base32 Structure Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">Base32Kit 0.2.1 Docs</a> (100% documented)</p>
+        <p class="header-right"><a href="https://github.com/jenslauterbach/Base32Kit"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">Base32Kit Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        Base32 Structure Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/Base32.html">Base32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/Base32/DecodingError.html">– DecodingError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>Base32</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Base32</span></code></pre>
+
+                </div>
+              </div>
+            <p>The <code>Base32</code> struct contains methods to encode and decode data using the Base 32 encoding as defined by <a href="https://tools.ietf.org/html/rfc4648">RFC 4648</a>.</p>
+
+<p>The API supports both alphabets defined in the specification for encoding and decoding data:</p>
+
+<ol>
+<li>The Base 32 Alphabet (see <a href="https://tools.ietf.org/html/rfc4648#section-6">RFC 4648 Section 6</a>)</li>
+<li>The &ldquo;Extended Hex&rdquo; Base 32 Alphabet (see <a href="https://tools.ietf.org/html/rfc4648#section-7">RFC 4648 Section 7</a>)</li>
+</ol>
+
+<p>The API only supports the encoding and decoding of strings and no other data types. All the inputs are validated and the API will throw exceptions instead of
+ignoring illegal input.</p>
+
+<p>All methods are <code>static</code> so no instance of the <code>Base32</code> struct needs to be created.</p>
+
+<p><strong>Examples:</strong></p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">encoded</span> <span class="o">=</span> <span class="kt">Base32</span><span class="o">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"foobar"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">encoded</span><span class="p">)</span> <span class="c1">// prints "MZXW6YTBOI======"</span>
+
+<span class="k">if</span> <span class="k">let</span> <span class="nv">decoded</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">Base32</span><span class="o">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="n">encoded</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span> <span class="c1">// prints "foobar"</span>
+<span class="p">}</span>
+</code></pre>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    Encoding and decoding methods are not optimized and might perform badly. Use another Swift package if performance is a primary concern.
+
+</div><div class="aside aside-warning">
+    <p class="aside-title">Warning</p>
+    This API is still under development. APIs are subject to change and error. Do not use in production.
+
+</div>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V6encode6stringS2S_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/encode(string:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V6encode6stringS2S_tFZ">encode(string:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Encodes the given <code>string</code> with the standard Base 32 alphabet as defined in section 6 of RFC 4648.</p>
+
+<p>If the given <code>string</code> is empty, the encoded <code>String</code> will also be empty. The  result can contain padding (<code>=</code>), if the given <code>string</code> does not
+contain a multiple of 5 input characters.</p>
+
+<p><strong>Examples:</strong></p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">encoded</span> <span class="o">=</span> <span class="kt">Base32</span><span class="o">.</span><span class="nf">encode</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"foobar"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">encoded</span><span class="p">)</span> <span class="c1">// prints "MZXW6YTBOI======"</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    <p>This method is case insensitive.</p>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">encode</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>string</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The  string to encode.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Base 32 encoded <code>String</code> or empty <code>String</code> if the given <code>string</code> is empty.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V9encodeHex6stringS2S_tFZ"></a>
+                    <a name="//apple_ref/swift/Method/encodeHex(string:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V9encodeHex6stringS2S_tFZ">encodeHex(string:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Encodes the given <code>string</code> with the &ldquo;Extended Hex&rdquo; Base 32 alphabet as defined in section 7 of RFC 4648.</p>
+
+<p>If the given <code>string</code> is empty, the encoded <code>String</code> will also be empty. The  result can contain padding (<code>=</code>), if the given <code>string</code> does not
+contain a multiple of 5 input characters.</p>
+
+<p><strong>Examples:</strong></p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">encoded</span> <span class="o">=</span> <span class="kt">Base32</span><span class="o">.</span><span class="nf">encodeHex</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"foobar"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">encoded</span><span class="p">)</span> <span class="c1">// prints "CPNMUOJ1E8======"</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    <p>This method is case insensitive.</p>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">encodeHex</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>string</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The string to encode.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Base 32 Hex encoded <code>String</code> or empty <code>String</code> if the given <code>string</code> is empty.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V6decode6stringS2S_tKFZ"></a>
+                    <a name="//apple_ref/swift/Method/decode(string:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V6decode6stringS2S_tKFZ">decode(string:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Decodes the given <code>string</code> with the standard Base 32 alphabet.</p>
+
+<p>If the given <code>string</code> is empty, the decoded <code>String</code> will also be empty. This method is case in-senstive.</p>
+
+<p><strong>Examples:</strong></p>
+<pre class="highlight swift"><code><span class="k">if</span> <span class="k">let</span> <span class="nv">decoded</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">Base32</span><span class="o">.</span><span class="nf">decode</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"MZXW6YTBOI======"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span> <span class="c1">// prints "foobar"</span>
+<span class="p">}</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    <p>This method is case insensitive.</p>
+
+</div><div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <p>Throws:</p>
+
+<ul>
+<li><code><a href="../Structs/Base32/DecodingError.html#/s:9Base32Kit0A0V13DecodingErrorO13invalidLengthyA2EmF">Base32.DecodingError.invalidLength</a></code> if the encoded string has invalid length (is not a multiple of 8 or empty).</li>
+<li><code>Base32.DecodingError.illegalCharactersFound</code> if the encoded string contains one or more illegal characters.</li>
+<li><code><a href="../Structs/Base32/DecodingError.html#/s:9Base32Kit0A0V13DecodingErrorO24invalidPaddingCharactersyA2EmF">Base32.DecodingError.invalidPaddingCharacters</a></code> if the encoded string contains a padding character (<code>=</code>) at an illegal position.</li>
+<li><code><a href="../Structs/Base32/DecodingError.html#/s:9Base32Kit0A0V13DecodingErrorO16missingCharacteryA2EmF">Base32.DecodingError.missingCharacter</a></code> if no character can be read even though there a character is expected.</li>
+</ul>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">decode</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>string</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The  string to decode.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Decoded string or empty <code>String</code> if the given <code>string</code> is empty.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V9decodeHex6stringS2S_tKFZ"></a>
+                    <a name="//apple_ref/swift/Method/decodeHex(string:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V9decodeHex6stringS2S_tKFZ">decodeHex(string:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Decodes the given <code>string</code> with the &ldquo;Extended Hex&rdquo; Base 32 alphabet.</p>
+
+<p>If the given <code>string</code> is empty, the decoded <code>String</code> will also be empty.</p>
+
+<p><strong>Examples:</strong></p>
+<pre class="highlight swift"><code><span class="k">if</span> <span class="k">let</span> <span class="nv">decoded</span> <span class="o">=</span> <span class="k">try</span><span class="p">?</span> <span class="kt">Base32</span><span class="o">.</span><span class="nf">decodeHex</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"CPNMUOJ1E8======"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span> <span class="c1">// prints "foobar"</span>
+<span class="p">}</span>
+</code></pre>
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    <p>This method is case insensitive.</p>
+
+</div><div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <p>Throws:</p>
+
+<ul>
+<li><code><a href="../Structs/Base32/DecodingError.html#/s:9Base32Kit0A0V13DecodingErrorO13invalidLengthyA2EmF">Base32.DecodingError.invalidLength</a></code> if the encoded string has invalid length (is not a multiple of 8 or empty).</li>
+<li><code>Base32.DecodingError.illegalCharactersFound</code> if the encoded string contains one or more illegal characters.</li>
+<li><code><a href="../Structs/Base32/DecodingError.html#/s:9Base32Kit0A0V13DecodingErrorO24invalidPaddingCharactersyA2EmF">Base32.DecodingError.invalidPaddingCharacters</a></code> if the encoded string contains a padding character (<code>=</code>) at an illegal position.</li>
+<li><code><a href="../Structs/Base32/DecodingError.html#/s:9Base32Kit0A0V13DecodingErrorO16missingCharacteryA2EmF">Base32.DecodingError.missingCharacter</a></code> if no character can be read even though there a character is expected.</li>
+</ul>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">decodeHex</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>string</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The string to decode.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Decoded  string or empty <code>String</code> if the given <code>string</code> is empty.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V13DecodingErrorO"></a>
+                    <a name="//apple_ref/swift/Enum/DecodingError" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V13DecodingErrorO">DecodingError</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Errors that can be thrown during decoding of a Base 32 encoded string.</p>
+
+                        <a href="../Structs/Base32/DecodingError.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">DecodingError</span> <span class="p">:</span> <span class="kt">Error</span><span class="p">,</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2020 <a class="link" href="https://github.com/jenslauterbach" target="_blank" rel="external">Jens Lauterbach</a>. All rights reserved. (Last updated: 2020-05-01)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

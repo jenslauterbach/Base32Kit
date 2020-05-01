@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>DecodingError Enumeration Reference</title>
+    <link rel="stylesheet" type="text/css" href="../../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../../js/jquery.min.js" defer></script>
+    <script src="../../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Enum/DecodingError" class="dashAnchor"></a>
+    <a title="DecodingError Enumeration Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../../index.html">Base32Kit 0.2.1 Docs</a> (100% documented)</p>
+        <p class="header-right"><a href="https://github.com/jenslauterbach/Base32Kit"><img src="../../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../../index.html">Base32Kit Reference</a>
+        <img id="carat" src="../../img/carat.png" />
+        DecodingError Enumeration Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../../Structs/Base32.html">Base32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../../Structs/Base32/DecodingError.html">– DecodingError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>DecodingError</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">DecodingError</span> <span class="p">:</span> <span class="kt">Error</span><span class="p">,</span> <span class="kt">Equatable</span></code></pre>
+
+                </div>
+              </div>
+            <p>Errors that can be thrown during decoding of a Base 32 encoded string.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V13DecodingErrorO13invalidLengthyA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/invalidLength" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V13DecodingErrorO13invalidLengthyA2EmF">invalidLength</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The <code>String</code> to decode has invalid length. A string that should be decoded should have a length that is a multiple of 8
+(e.g. 8 characters, 16, 24 &hellip; 80, 96, etc.)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">invalidLength</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V13DecodingErrorO22illegalCharactersFoundyAEShySJGcAEmF"></a>
+                    <a name="//apple_ref/swift/Element/illegalCharactersFound(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V13DecodingErrorO22illegalCharactersFoundyAEShySJGcAEmF">illegalCharactersFound(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Thrown when the encoded <code>String</code> contains illegal characters.</p>
+
+<p>Base 32 Encoding only supports a very limited set of legal characters to which data can be encoded to. If a given <em>encoded</em> <code>String</code> contains
+characters that are not part of this alphabet, this error is thrown.</p>
+
+<p>The error contains a <code>Set</code> of all the illegal <code>Character</code>s that were found.</p>
+<pre class="highlight swift"><code><span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">decoded</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">Base32</span><span class="o">.</span><span class="nf">decode</span><span class="p">(</span><span class="s">"1======="</span><span class="p">)</span> <span class="c1">// The character "1" is not a legal character</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="kt">Base32</span><span class="o">.</span><span class="kt">DecodingError</span><span class="o">.</span><span class="nf">illegalCharactersFound</span><span class="p">(</span><span class="k">let</span> <span class="nv">illegalCharacters</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"The given string can not be decoded because it contains illegal characters: </span><span class="se">\(</span><span class="n">illegalCharacters</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">illegalCharactersFound</span><span class="p">(</span><span class="kt">Set</span><span class="o">&lt;</span><span class="kt">Character</span><span class="o">&gt;</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V13DecodingErrorO24invalidPaddingCharactersyA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/invalidPaddingCharacters" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V13DecodingErrorO24invalidPaddingCharactersyA2EmF">invalidPaddingCharacters</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Thrown when the encoded  <code>String</code> contains one or more invalid padding characters (<code>=</code>).</p>
+
+<p>Padding characters are only allowed at the end of the encoded string and no other character is allowed to follow.</p>
+
+<p>Examples:</p>
+
+<ul>
+<li>OK: <code>&quot;MZXQ====&quot;</code></li>
+<li>Not OK: <code>&quot;M=XQ====&quot;</code></li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">invalidPaddingCharacters</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9Base32Kit0A0V13DecodingErrorO16missingCharacteryA2EmF"></a>
+                    <a name="//apple_ref/swift/Element/missingCharacter" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9Base32Kit0A0V13DecodingErrorO16missingCharacteryA2EmF">missingCharacter</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Thrown when reading the encoded <code>String</code> and no character can be found at position one or two even though it should exist.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="n">missingCharacter</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2020 <a class="link" href="https://github.com/jenslauterbach" target="_blank" rel="external">Jens Lauterbach</a>. All rights reserved. (Last updated: 2020-05-01)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

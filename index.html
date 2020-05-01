@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Base32Kit  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a title="Base32Kit  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">Base32Kit 0.2.1 Docs</a> (100% documented)</p>
+        <p class="header-right"><a href="https://github.com/jenslauterbach/Base32Kit"><img src="img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">Base32Kit Reference</a>
+        <img id="carat" src="img/carat.png" />
+        Base32Kit  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Structs/Base32.html">Base32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Base32/DecodingError.html">– DecodingError</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='base32kit' class='heading'>Base32Kit</h1>
+
+<p><a href="https://swift.org"><img src="https://img.shields.io/badge/Swift-5.2-orange.svg" alt="Swift 5.2"></a>
+<img src="https://github.com/jenslauterbach/Base32Kit/workflows/Build%20and%20Test/badge.svg" alt="CI"></p>
+
+<blockquote>
+<p>Disclaimer: This library is in its early development phase and should not yet be used in production. All the code in this repository might change, including its APIs. This library is not very well optimised. If you are looking for the absolute best performance this library is probably not for you.</p>
+</blockquote>
+
+<p>Base32Kit is a simple <em>pure</em> Swift Library for the Base32 encoding as defined by <a href="https://tools.ietf.org/html/rfc4648">RFC 4648</a> that is implemented <em>without</em> Apples Foundation framework.</p>
+
+<p>API reference documentation is available at <a href="https://jenslauterbach.github.io/Base32Kit/">https://jenslauterbach.github.io/Base32Kit/</a></p>
+<h2 id='table-of-contents' class='heading'>Table of Contents</h2>
+
+<ul>
+<li><a href="#installation">Installation</a>
+
+<ul>
+<li><a href="#swift-package-manager">Swift Package Manager</a></li>
+</ul></li>
+<li><a href="#usage">Usage</a>
+
+<ul>
+<li><a href="#encoding">Encoding</a></li>
+<li><a href="#decoding">Decoding</a></li>
+</ul></li>
+<li><a href="#design-goals">Design Goals</a></li>
+<li><a href="#alternatives">Alternatives</a></li>
+<li><a href="#versioning">Versioning</a></li>
+<li><a href="#authors">Authors</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#acknowledgments">Acknowledgments</a></li>
+</ul>
+<h2 id='installation' class='heading'>Installation</h2>
+
+<p><a href="#table-of-contents">(Back to top)</a></p>
+<h3 id='swift-package-manager' class='heading'>Swift Package Manager</h3>
+<pre class="highlight plaintext"><code>// swift-tools-version:5.2
+import PackageDescription
+
+let package = Package(
+    dependencies: [
+        .package(url: "https://github.com/jenslauterbach/Base32Kit.git", from: "0.2.0"),
+    ]
+)
+</code></pre>
+<h2 id='usage' class='heading'>Usage</h2>
+<h3 id='encoding' class='heading'>Encoding</h3>
+<pre class="highlight plaintext"><code>import Base32Kit
+
+let encoded = Base32.encode(string: "foobar")
+print(encoded) // prints MZXW6YTBOI======
+</code></pre>
+<h3 id='decoding' class='heading'>Decoding</h3>
+
+<p>All <code>decode*</code> methods can throw an error. In general you have two options of dealing with this. If you are not interested in the error and just need to decode the value or do &ldquo;nothing&rdquo;, you can use a simple <code>try?</code> statement:</p>
+<pre class="highlight plaintext"><code>import Base32Kit
+
+if let decoded = try? Base32.decode(string: "MZXW6YTBOI======") {
+    print(decoded) // prints "foobar"
+}
+</code></pre>
+
+<p>If you want to handle any possible error in a more generlised way, you can use the following simple <code>do-catch</code> statement:</p>
+<pre class="highlight plaintext"><code>import Base32Kit
+
+do {
+    let decoded = try Base32.decode(string: "MZXW6YTBOI======")
+    print(decoded) // prints "foobar"
+} catch {
+    print("Error!")
+}
+</code></pre>
+
+<p>The above code does not allow to handle all the different errors that may be thrown separately. To handle errors separately, you can use an extended version of the above <code>do-catch</code> statement:</p>
+<pre class="highlight plaintext"><code>import Base32Kit
+
+do {
+    let decoded = try Base32.decode(string: "MZXW6YTBOI======")
+    print(decoded) // prints "foobar"
+} catch Base32.DecodingError.invalidLength {
+    print("Encoded string has invalid length!")
+} catch Base32.DecodingError.invalidPaddingCharacters {
+    print("Encoded string uses illegal padding characters!")
+} catch Base32.DecodingError.invalidCharacter(let illegalCharacters) {
+    print("Encoded string contained the following illegal characters: \(illegalCharacters)")
+} catch Base32.DecodingError.missingCharacter {
+    print("During decoding there was an unexpected missing character!")
+} catch {
+    print("Error!")
+}
+</code></pre>
+<h2 id='design-goals' class='heading'>Design Goals</h2>
+
+<p><a href="#table-of-contents">(Back to top)</a></p>
+
+<p>The primary design goals of this Swift package are:</p>
+
+<ol>
+<li>100% RFC 4648 compliance.</li>
+<li>Cross-platform (run everywhere where Swift runs).</li>
+<li>The code is easy to read and understand.</li>
+</ol>
+
+<p>Furthermore, we try to create a comprehensive test suite to verify the package with a big variety of test data on all supported platforms.</p>
+<h2 id='alternatives' class='heading'>Alternatives</h2>
+
+<p><a href="#table-of-contents">(Back to top)</a></p>
+
+<ul>
+<li><a href="https://github.com/norio-nomura/Base32">Base32</a> by <a href="https://github.com/norio-nomura">Norio Nomura</a></li>
+<li><a href="https://github.com/std-swift/Base32">Base32</a> by <a href="https://github.com/std-swift">std-swift</a></li>
+</ul>
+<h2 id='versioning' class='heading'>Versioning</h2>
+
+<p><a href="#table-of-contents">(Back to top)</a></p>
+
+<p>We use SemVer for versioning. For the versions available, see the <a href="https://github.com/jenslauterbach/Base32Kit/releases">releases</a> page.</p>
+<h2 id='authors' class='heading'>Authors</h2>
+
+<p><a href="#table-of-contents">(Back to top)</a></p>
+
+<ul>
+<li>Jens Lauterbach - Main author - (@jenslauterbach)</li>
+</ul>
+<h2 id='license' class='heading'>License</h2>
+
+<p><a href="#table-of-contents">(Back to top)</a></p>
+
+<p>This project is licensed under the Apache 2.0 License - see the <a href="https://github.com/jenslauterbach/Base32Kit/blob/master/LICENSE">LICENSE</a> file for details.</p>
+<h2 id='acknowledgments' class='heading'>Acknowledgments</h2>
+
+<p><a href="#table-of-contents">(Back to top)</a></p>
+
+<ul>
+<li><a href="https://github.com/fabianfett">Fabian Fett</a> - For his inspiring <a href="https://github.com/fabianfett/swift-base64-kit">Base64Kit</a> implementation</li>
+</ul>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2020 <a class="link" href="https://github.com/jenslauterbach" target="_blank" rel="external">Jens Lauterbach</a>. All rights reserved. (Last updated: 2020-05-01)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
