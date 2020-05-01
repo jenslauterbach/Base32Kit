@@ -1,6 +1,6 @@
 # Base32Kit
 
-[![Swift 5.2](https://img.shields.io/badge/Swift-5.2-orange.svg)](https://swift.org)
+[![Swift 5.0 | 5.1 | 5.2](https://img.shields.io/badge/Swift-5.0%20%7C%C2%A05.1%20%7C%C2%A05.2-blue.svg)](https://swift.org)
 ![CI](https://github.com/jenslauterbach/Base32Kit/workflows/Build%20and%20Test/badge.svg)
 
 > Disclaimer: This library is in its early development phase and should not yet be used in production. All the code in this repository might change, including its APIs. This library is not very well optimised. If you are looking for the absolute best performance this library is probably not for you.
