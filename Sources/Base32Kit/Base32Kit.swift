@@ -103,17 +103,7 @@ public struct Base32 {
             return ""
         }
         
-        guard string.count % 8 == 0 else {
-            throw Base32.DecodingError.invalidLength
-        }
-        
-        if let illegalCharacters = findIllegalCharacters(in: string, legalCharacters: "ABCDEFGHIJKLMNOPQRSRTUVWXYZabcdefghiklmnopqrstuvwxyz234567=") {
-            throw Base32.DecodingError.illegalCharactersFound(illegalCharacters)
-        }
-        
-        if invalidPadding(in: string) {
-            throw Base32.DecodingError.invalidPaddingCharacters
-        }
+        try validate(string: string, legalCharacters: "ABCDEFGHIJKLMNOPQRSRTUVWXYZabcdefghiklmnopqrstuvwxyz234567=")
         
         return try decode(bytes: Array(string.utf8), alphabet: decodeBase32)
     }
@@ -146,17 +136,7 @@ public struct Base32 {
             return ""
         }
         
-        guard string.count % 8 == 0 else {
-            throw Base32.DecodingError.invalidLength
-        }
-        
-        if let illegalCharacters = findIllegalCharacters(in: string, legalCharacters: "ABCDEFGHIJKLMNOPQRSTUVabcdefghijklmnopqrstuv0123456789=") {
-            throw Base32.DecodingError.illegalCharactersFound(illegalCharacters)
-        }
-        
-        if invalidPadding(in: string) {
-            throw Base32.DecodingError.invalidPaddingCharacters
-        }
+        try validate(string: string, legalCharacters: "ABCDEFGHIJKLMNOPQRSTUVabcdefghijklmnopqrstuv0123456789=")
         
         return try decode(bytes: Array(string.utf8), alphabet: decodeBase32hex)
     }
@@ -164,6 +144,36 @@ public struct Base32 {
 
 // MARK: Validation
 extension Base32 {
+    
+    /// Validate the given `string` to be a "valid" Base 32 encoded string.
+    ///
+    /// The following criteria is validated:
+    ///
+    /// - length (must be a multiple of 8)
+    /// - only contains legal characters as defined by the `legalCharacters`
+    /// - contain only valid padding.
+    ///
+    /// - Parameters:
+    ///     - string: the encoded string to validate.
+    ///     - legalCharacters: a `String` containing all legal characters.
+    ///
+    /// - Throws:
+    ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
+    ///     - `Base32.DecodingError.illegalCharactersFound` if the encoded string contains one or more illegal characters.
+    ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
+    private static func validate(string: String, legalCharacters: String) throws {
+        guard string.count % 8 == 0 else {
+            throw Base32.DecodingError.invalidLength
+        }
+        
+        if let illegalCharacters = findIllegalCharacters(in: string, legalCharacters: legalCharacters) {
+            throw Base32.DecodingError.illegalCharactersFound(illegalCharacters)
+        }
+        
+        if invalidPadding(in: string) {
+            throw Base32.DecodingError.invalidPaddingCharacters
+        }
+    }
     
     /// Determines whether the given `string` contains invalid padding.
     ///
