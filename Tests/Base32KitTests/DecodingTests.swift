@@ -228,6 +228,10 @@ final class DecodingTests: XCTestCase {
             "MZXW6=TB",
             "MZXW6Y=B",
             
+            // Technically correct padding, but at positions that are not valid:
+            "MZXW6Y==",
+            "MZX=====",
+            
             // Padding at different invalid positions:
             "M=XW6Y=B",
             "=ZXW6Y=B",
@@ -237,7 +241,7 @@ final class DecodingTests: XCTestCase {
             "=ZXW6YTBOI======",
             "MZXW6Y=BOI======",
             "MZ=W6Y=BOI======",
-            "=ZXW6Y=BOI======",
+            "=ZXW6Y=BOI======"
         ]
         
         for encoded in testStrings {
