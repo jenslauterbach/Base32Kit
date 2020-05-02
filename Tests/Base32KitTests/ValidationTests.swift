@@ -2,7 +2,7 @@ import XCTest
 @testable import Base32Kit
 
 final class ValidationTests: XCTestCase {
-    
+
     static var allTests = [
         // Normal alphabet tests:
         ("testValidPadding", testValidPadding),
@@ -20,16 +20,16 @@ final class ValidationTests: XCTestCase {
             "MZXW6YTB",
             "MZXW6YTBOI======"
         ]
-        
+
         for encodedString in encodedStrings {
             // when:
             let hasInvalidPadding = Base32.invalidPadding(in: encodedString)
-            
+
             // then:
             XCTAssertFalse(hasInvalidPadding, "Encoded String '\(encodedString)' has no invalid padding.")
         }
     }
-    
+
     func testInvalidPadding() {
         // given:
         let encodedStrings: [String] = [
@@ -42,7 +42,7 @@ final class ValidationTests: XCTestCase {
             "MZXW6YTBM=======",
             "MZXW6YTBMZX=====",
             "MZXW6YTBMZXW6Y==",
-            
+
             // Invalid padding at random positions:
             "=ZXW6===",
             "=ZXW6YTB",
@@ -59,11 +59,11 @@ final class ValidationTests: XCTestCase {
             "MZ=W6Y=BOI======",
             "=ZXW6Y=BOI======"
         ]
-        
+
         for encodedString in encodedStrings {
             // when:
             let hasInvalidPadding = Base32.invalidPadding(in: encodedString)
-            
+
             // then:
             XCTAssertTrue(hasInvalidPadding, "Encoded String '\(encodedString)' has invalid padding.")
         }

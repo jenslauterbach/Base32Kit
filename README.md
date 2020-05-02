@@ -9,15 +9,15 @@
 
 Base32Kit is a simple _pure_ Swift Library for the Base32 encoding as defined by [RFC 4648](https://tools.ietf.org/html/rfc4648) that is implemented _without_ Apples Foundation framework.
 
-API reference documentation is available at https://jenslauterbach.github.io/Base32Kit/
+API reference documentation is available at [https://jenslauterbach.github.io/Base32Kit/](https://jenslauterbach.github.io/Base32Kit/)
 
 ## Table of Contents
 
 - [Installation](#installation)
-  - [Swift Package Manager](#swift-package-manager)
+    - [Swift Package Manager](#swift-package-manager)
 - [Usage](#usage)
-  - [Encoding](#encoding)
-  - [Decoding](#decoding)
+    - [Encoding](#encoding)
+    - [Decoding](#decoding)
 - [Design Goals](#design-goals)
 - [Alternatives](#alternatives)
 - [Versioning](#versioning)
@@ -107,7 +107,7 @@ The primary design goals of this Swift package are:
 
 1. 100% RFC 4648 compliance.
 2. Cross-platform (run everywhere where Swift runs).
-2. The code is easy to read and understand.
+3. The code is easy to read and understand.
 
 Furthermore, we try to create a comprehensive test suite to verify the package with a big variety of test data on all supported platforms.
 
@@ -128,7 +128,7 @@ We use SemVer for versioning. For the versions available, see the [releases](htt
 
 [(Back to top)](#table-of-contents)
 
-* Jens Lauterbach - Main author - (@jenslauterbach)
+- Jens Lauterbach - Main author - (@jenslauterbach)
 
 ## License
 
@@ -140,4 +140,4 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](https:
 
 [(Back to top)](#table-of-contents)
 
-* [Fabian Fett](https://github.com/fabianfett) - For his inspiring [Base64Kit](https://github.com/fabianfett/swift-base64-kit) implementation
+- [Fabian Fett](https://github.com/fabianfett) - For his inspiring [Base64Kit](https://github.com/fabianfett/swift-base64-kit) implementation
