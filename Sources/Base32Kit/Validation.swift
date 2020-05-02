@@ -1,5 +1,5 @@
 extension Base32 {
-    
+
     /// Validate the given `string` to be a "valid" Base 32 encoded string.
     ///
     /// The following criteria is validated:
@@ -13,23 +13,26 @@ extension Base32 {
     ///     - legalCharacters: a `String` containing all legal characters.
     ///
     /// - Throws:
-    ///     - `Base32.DecodingError.invalidLength` if the encoded string has invalid length (is not a multiple of 8 or empty).
-    ///     - `Base32.DecodingError.illegalCharactersFound` if the encoded string contains one or more illegal characters.
-    ///     - `Base32.DecodingError.invalidPaddingCharacters` if the encoded string contains a padding character (`=`) at an illegal position.
+    ///     - `Base32.DecodingError.invalidLength`
+    ///        if encoded string has invalid length (is not a multiple of 8 or empty).
+    ///     - `Base32.DecodingError.illegalCharactersFound`
+    ///        if encoded string contains one or more illegal characters.
+    ///     - `Base32.DecodingError.invalidPaddingCharacters`
+    ///        if encoded string contains a padding character (`=`) at an illegal position.
     static func validate(string: String, legalCharacters: String) throws {
         guard string.count % 8 == 0 else {
             throw Base32.DecodingError.invalidLength
         }
-        
+
         if let illegalCharacters = findIllegalCharacters(in: string, legalCharacters: legalCharacters) {
             throw Base32.DecodingError.illegalCharactersFound(illegalCharacters)
         }
-        
+
         if invalidPadding(in: string) {
             throw Base32.DecodingError.invalidPaddingCharacters
         }
     }
-    
+
     /// Determines whether the given `string` contains invalid padding.
     ///
     /// Padding is only allowed at certain places of a Base 32 encoded `String`:
@@ -61,11 +64,11 @@ extension Base32 {
         if string.starts(with: "=") {
             return true
         }
-        
+
         guard let firstPaddingIndex = string.firstIndex(of: "=") else {
             return false
         }
-        
+
         // There are three places where padding is not allowed, but would look valid to the other tests in this method.
         //
         // Consider the following pseudo encoded string: "ABCDEFGH"
@@ -104,13 +107,13 @@ extension Base32 {
             firstPaddingIndex == string.index(string.endIndex, offsetBy: -7) {
             return true
         }
-        
+
         // Find the first padding character and check that none of the following characters is something other than a
         // padding character.
         let padding = string[firstPaddingIndex..<string.endIndex]
         return !padding.allSatisfy({ $0 == "=" })
     }
-    
+
     /// Returns a `Set` of characters that is in the given `string` but not in the given `legalCharacters`.
     ///
     /// - Parameters:
