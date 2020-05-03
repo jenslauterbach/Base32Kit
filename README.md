@@ -18,6 +18,7 @@ API reference documentation is available at [https://jenslauterbach.github.io/Ba
 - [Usage](#usage)
     - [Encoding](#encoding)
     - [Decoding](#decoding)
+- [Quick Start](#quick-start)
 - [Design Goals](#design-goals)
 - [Alternatives](#alternatives)
 - [Versioning](#versioning)
@@ -97,6 +98,25 @@ do {
 } catch {
     print("Error!")
 }
+```
+
+## Quick Start
+
+[(Back to top)](#table-of-contents)
+
+You can start playing around with `Base32Kit` by using the Swift REPL on your local machine:
+
+```Bash
+$ git clone https://github.com/jenslauterbach/Base32Kit.git
+$ cd Base32Kit
+$ swift run --repl
+
+1> import Base32Kit
+2> Base32.encode(string: "foobar")
+$R0: String = "MZXW6YTBOI======"
+3> try? Base32.decode(string: $R0)
+$R1: String? = "foobar"
+4> :quit
 ```
 
 ## Design Goals
