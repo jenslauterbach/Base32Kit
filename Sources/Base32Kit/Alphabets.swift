@@ -1,8 +1,16 @@
-struct Alphabet {
-    static let encodePaddingCharacter: UInt8 = UInt8(ascii: "=")
+public enum Alphabet {
+    case standard
+    case hex
 }
 
-extension Alphabet {
+extension Base32 {
+    static let encodePaddingCharacter: UInt8 = UInt8(ascii: "=")
+
+    static let encodingTables: [Alphabet: [UInt8]] = [
+        .standard: base32,
+        .hex: base32hex,
+    ]
+
     static let base32: [UInt8] = [
         UInt8(ascii: "A"), //  0
         UInt8(ascii: "B"), //  1
@@ -35,12 +43,11 @@ extension Alphabet {
         UInt8(ascii: "4"), // 28
         UInt8(ascii: "5"), // 29
         UInt8(ascii: "6"), // 30
-        UInt8(ascii: "7")  // 31
+        UInt8(ascii: "7"), // 31
     ]
 }
 
-extension Alphabet {
-
+extension Base32 {
     static let base32hex: [UInt8] = [
         UInt8(ascii: "0"), //  0
         UInt8(ascii: "1"), //  1
@@ -73,13 +80,18 @@ extension Alphabet {
         UInt8(ascii: "S"), // 28
         UInt8(ascii: "T"), // 29
         UInt8(ascii: "U"), // 30
-        UInt8(ascii: "V")  // 31
+        UInt8(ascii: "V"), // 31
     ]
 }
 
 extension Base32 {
-
     private static let __: UInt8 = 255
+
+    static let decodingTables: [Alphabet: [UInt8]] = [
+        .standard: decodeBase32,
+        .hex: decodeBase32hex,
+    ]
+
     static let decodeBase32: [UInt8] = [
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
@@ -96,14 +108,14 @@ extension Base32 {
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
-        __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __
+        __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
     ]
 
     static let decodeBase32hex: [UInt8] = [
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
-         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, __, __, __, __, __, __,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, __, __, __, __, __, __,
         __, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
         25, 26, 27, 28, 29, 30, 31, __, __, __, __, __, __, __, __, __,
         __, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
@@ -115,6 +127,6 @@ extension Base32 {
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
         __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
-        __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __
+        __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
     ]
 }
