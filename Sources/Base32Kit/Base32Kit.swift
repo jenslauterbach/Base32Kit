@@ -174,6 +174,16 @@ public struct Base32 {
     }
 }
 
+
+public struct DecodingOptions: OptionSet {
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
+    public let rawValue: Int
+    
+    public static let strict = DecodingOptions(rawValue: 1 << 0)
+}
+
 extension Base32 {
     /// Decodes the given `String` with the given Base 32 alphabet.
     ///
@@ -209,13 +219,17 @@ extension Base32 {
     ///        if the encoded string contains a padding character (`=`) at an illegal position.
     ///     - `DecodingError.missingCharacter`
     ///        if no character can be read even though there a character is expected.
-    public static func decode(encoded: String, alphabet: Alphabet = .standard) throws -> [UInt8] {
+    public static func decode(encoded: String, alphabet: Alphabet = .standard, options: DecodingOptions = [.strict]) throws -> [UInt8] {
         if encoded.isEmpty {
             return []
         }
-
-        guard encoded.count % 8 == 0 else {
-            throw DecodingError.invalidLength
+        
+        let isStrict: Bool = options.contains(.strict)
+        
+        if isStrict {
+            guard !isStrict, encoded.count % 8 == 0 else {
+                throw DecodingError.invalidLength
+            }
         }
 
         let bytes = Array(encoded.utf8)
