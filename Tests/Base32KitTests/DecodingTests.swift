@@ -24,7 +24,7 @@ final class Base32DecodingTests: XCTestCase {
         asciiCharacters.remove(Base32.encodePaddingCharacter)
 
         // Remove the "NUL" control character. It can not be part of a String and therefore is a "non character". There
-        // is a separate test to specfically test for the NUL character.
+        // is a separate test to specifically test for the NUL character.
         asciiCharacters.remove(0)
 
         return asciiCharacters
@@ -57,6 +57,13 @@ final class Base32DecodingTests: XCTestCase {
 
         return asciiCharacters
     }()
+
+    func testTotp() throws {
+        let input = "YBJC77RSAGQG4BNPIAWNHYQQBLAEFQKS4PZGWXIP6BXXNSZY37VQ"
+        let notStrict: DecodingOptions = []
+        let decoded = try Base32.decode(encoded: input, options: notStrict)
+        print(decoded)
+    }
 
     func testRFC4648TestVectors() throws {
         let testData: [String: String] = [
@@ -108,7 +115,7 @@ final class Base32DecodingTests: XCTestCase {
         for encoded in testData {
             assert(
                 try Base32.decode(encoded: encoded),
-                throws: DecodingError.invalidLength
+                throws: Base32.DecodingError.invalidLength
             )
         }
     }
@@ -116,10 +123,9 @@ final class Base32DecodingTests: XCTestCase {
     func testInvalidAsciiCharacters() {
         for character in invalidAsciiCharacters {
             let encoded = String(format: "%c=======", character)
-
             assert(
                 try Base32.decode(encoded: encoded),
-                throws: DecodingError.illegalCharacter
+                throws: Base32.DecodingError.illegalCharacter
             )
         }
     }
@@ -141,76 +147,45 @@ final class Base32DecodingTests: XCTestCase {
                 let encoded = String(emoji) + "======="
                 assert(
                     try Base32.decode(encoded: encoded),
-                    throws: DecodingError.illegalCharacter
+                    throws: Base32.DecodingError.illegalCharacter
                 )
             }
         }
     }
 
+    func testTestEmoji() {
+        let emoji = UnicodeScalar(0x1F600)
+        let encoded = String(emoji!) + "======="
+
+        assert(
+                try Base32.decode(encoded: encoded),
+                throws: Base32.DecodingError.illegalCharacter
+        )
+    }
+
     func testLineBreaks() throws {
         let testStrings: [String] = [
             // New lines at the end of the string:
-            "a======\n",
-            "a======\r\n",
+            "mzxw6yt\n",
+            "mzxw6yt\r\n",
 
             // New lines in the middle of the string:
-            "a===\n===",
-            "a===\r\n===",
+            "mzxw\nytb",
+            "mzxw\r\nytb",
 
             // New lines at the beginning of the string:
-            "\na======",
-            "\r\na======",
+            "\nzxw6ytb",
+            "\r\nzxw6ytb",
         ]
 
         for encoded in testStrings {
             assert(
                 try Base32.decode(encoded: encoded),
-                throws: DecodingError.illegalCharacter
+                throws: Base32.DecodingError.illegalCharacter
             )
         }
     }
 
-     func deactivated_testMisplacedPaddingCharacter() {
-         let testStrings: [String] = [
-             // Only padding (not allowed):
-             "========",
-
-             // Padding at the beginning of a "valid" Base 32 encoded String:
-             "=ZXW6===",
-
-             // Move padding through a valid String:
-             "=ZXW6YTB",
-             "M=XW6YTB",
-             "MZ=W6YTB",
-             "MZX=6YTB",
-             "MZXW=YTB",
-             "MZXW6=TB",
-             "MZXW6Y=B",
-
-             // Technically correct padding, but at positions that are not valid:
-             "MZXW6Y==",
-             "MZX=====",
-
-             // Padding at different invalid positions:
-             "M=XW6Y=B",
-             "=ZXW6Y=B",
-
-             // Invalid padding in a Base 32 encoded String that is longer than a single "block":
-             "================",
-             "=ZXW6YTBOI======",
-             "MZXW6Y=BOI======",
-             "MZ=W6Y=BOI======",
-             "=ZXW6Y=BOI======",
-         ]
-
-         for encoded in testStrings {
-             assert(
-                 try Base32.decode(encoded: encoded),
-                 throws: DecodingError.unexpectedPaddingCharacter
-             )
-         }
-     }
-    
     /// Tests if decoding breaks if the string contains a NUL character.
     ///
     /// As stated in RFC4648, section 12:
@@ -234,7 +209,7 @@ final class Base32DecodingTests: XCTestCase {
 
         assert(
             try Base32.decode(encoded: encoded),
-            throws: DecodingError.illegalCharacter
+            throws: Base32.DecodingError.illegalCharacter
         )
     }
 
@@ -307,7 +282,7 @@ final class Base32DecodingTests: XCTestCase {
         for encoded in testData {
             assert(
                 try Base32.decode(encoded: encoded, alphabet: .hex),
-                throws: DecodingError.invalidLength
+                throws: Base32.DecodingError.invalidLength
             )
         }
     }
@@ -318,7 +293,7 @@ final class Base32DecodingTests: XCTestCase {
 
             assert(
                 try Base32.decode(encoded: encoded, alphabet: .hex),
-                throws: DecodingError.illegalCharacter
+                throws: Base32.DecodingError.illegalCharacter
             )
         }
     }
@@ -340,7 +315,7 @@ final class Base32DecodingTests: XCTestCase {
                 let encoded = String(emoji) + "======="
                 assert(
                     try Base32.decode(encoded: encoded, alphabet: .hex),
-                    throws: DecodingError.illegalCharacter
+                    throws: Base32.DecodingError.illegalCharacter
                 )
             }
         }
@@ -349,64 +324,26 @@ final class Base32DecodingTests: XCTestCase {
     func testHexLineBreaks() throws {
         let testStrings: [String] = [
             // New lines at the end of the string:
-            "a======\n",
-            "a======\r\n",
+            "cpnmuog\n",
+            "cpnmuog\r\n",
 
             // New lines in the middle of the string:
-            "a===\n===",
-            "a===\r\n===",
+            "cpnm\noj1",
+            "cpnm\r\noj1",
 
             // New lines at the beginning of the string:
-            "\na======",
-            "\r\na======",
+            "\npnmuoj1",
+            "\r\npnmuoj1",
         ]
 
         for encoded in testStrings {
             assert(
                 try Base32.decode(encoded: encoded, alphabet: .hex),
-                throws: DecodingError.illegalCharacter
+                throws: Base32.DecodingError.illegalCharacter
             )
         }
     }
 
-    /*
-     func testHexMisplacedPaddingCharacter() {
-         let testStrings: [String] = [
-             // Only padding (not allowed):
-             "========",
-
-             // Padding at the beginning of a "valid" Base 32 encoded String:
-             "=PNMU===",
-
-             // Move padding through a valid String:
-             "=PNMUOJ1",
-             "C=NMUOJ1",
-             "CP=MUOJ1",
-             "CPN=UOJ1",
-             "CPNM=OJ1",
-             "CPNMU=J1",
-             "CPNMUO=1",
-
-             // Padding at different invalid positions:
-             "C=NMUO=1",
-             "=PNMUO=1",
-
-             // Invalid padding in a Base 32 encoded String that is longer than a single "block":
-             "================",
-             "=PNMUOJ1E8======",
-             "CPNMUO=1E8======",
-             "CP=MUO=1E8======",
-             "=PNMUO=1E8======",
-         ]
-
-         for encoded in testStrings {
-             assert(
-                 try Base32.decodeHex(string: encoded),
-                 throws: Base32.DecodingError.invalidPaddingCharacters
-             )
-         }
-     }
-     */
     func testHexNulCharacter() {
         let bytes: [UInt8] = [
             67, // C
@@ -423,7 +360,7 @@ final class Base32DecodingTests: XCTestCase {
 
         assert(
             try Base32.decode(encoded: encoded, alphabet: .hex),
-            throws: DecodingError.illegalCharacter
+            throws: Base32.DecodingError.illegalCharacter
         )
     }
 

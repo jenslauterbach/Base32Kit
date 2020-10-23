@@ -174,7 +174,6 @@ public struct Base32 {
     }
 }
 
-
 public struct DecodingOptions: OptionSet {
     public init(rawValue: Int) {
         self.rawValue = rawValue
@@ -205,6 +204,7 @@ extension Base32 {
     ///
     /// - Parameter encoded: The string to decode.
     /// - Parameter alphabet: The alphabet to use for decoding (optional, default: standard).
+    /// - Parameter options: Set of DecodingOptions that influence decoding (optional, default: [.strict]]).
     ///
     /// - Returns: Decoded bytes or empty byte array if the given `String` is empty.
     ///
@@ -215,7 +215,7 @@ extension Base32 {
     ///        if the encoded string has invalid length (is not a multiple of 8 or empty).
     ///     - `DecodingError.illegalCharacter`
     ///        if the encoded string contains an illegal character.
-    ///     - `DecodingError.unexpectedPaddingCharacter`
+    ///     - `DecodingError.invalidPaddingCharacters`
     ///        if the encoded string contains a padding character (`=`) at an illegal position.
     ///     - `DecodingError.missingCharacter`
     ///        if no character can be read even though there a character is expected.
@@ -227,7 +227,7 @@ extension Base32 {
         let isStrict: Bool = options.contains(.strict)
         
         if isStrict {
-            guard !isStrict, encoded.count % 8 == 0 else {
+            guard encoded.count % 8 == 0 else {
                 throw DecodingError.invalidLength
             }
         }
@@ -302,16 +302,16 @@ extension Base32 {
 extension IteratorProtocol where Self.Element == UInt8 {
     mutating func nextBase32Value(alphabet: [UInt8]) throws -> UInt8 {
         guard let ascii = next() else {
-            throw DecodingError.missingCharacter
+            throw Base32.DecodingError.missingCharacter
+        }
+
+        if ascii == Base32.encodePaddingCharacter {
+            throw Base32.DecodingError.invalidPaddingCharacters
         }
 
         let char = alphabet[Int(ascii)]
         guard char != 255 else {
-            throw DecodingError.illegalCharacter
-        }
-
-        if ascii == Base32.encodePaddingCharacter {
-            throw DecodingError.unexpectedPaddingCharacter
+            throw Base32.DecodingError.illegalCharacter
         }
 
         return char
@@ -328,7 +328,7 @@ extension IteratorProtocol where Self.Element == UInt8 {
 
         let char = alphabet[Int(ascii)]
         guard char != 255 else {
-            throw DecodingError.illegalCharacter
+            throw Base32.DecodingError.illegalCharacter
         }
 
         return char
